@@ -10,6 +10,7 @@ datasource db {
 model SchoolProgress {
   id        Int     @id @default(autoincrement())
   school    String
-  progress  Int[]   // Array of integers
   password  String
+  progress  Int[]   // Array of integers
+  comments  String[]
 }

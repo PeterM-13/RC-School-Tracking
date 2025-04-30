@@ -21,9 +21,10 @@ body{
     background-color: var(--color-background);
     color: var(--color-primary);
 }
-h1, h2, h3, h4, h5, h6{
+h1, h2, h3, h4, h5, h6 {
     color: var(--color-primary);
     letter-spacing: var(--font-spacing);
+    font-family: var(--font-family);
 }
 a {
     color: var(--color-background);

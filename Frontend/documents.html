@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documents</title>
+</head>
+<body>
+    <header>
+        <h1><span style="color: rgb(220, 56, 56);">Rampaging chariots</span><br>Construction Tracking</h1>
+        <img id="logo" src="images/logo.png" alt="Logo">
+        <a id="back" href="./school-progress.html">Back</a>
+    </header>
+
+    <main>
+        <section id="docs">
+            <a href="./Docs/InstructionBooklet.pdf" target="_blank">Instruction Booklet</a>
+            <a href="./Docs/Rules2025.pdf" target="_blank">Rules</a>
+            <a href="./Docs/RampagingChariotsIntroduction.pptx" target="_blank">Introduction PowerPoint</a>
+            <a href="./Docs/MOT.pdf" target="_blank">M.O.T.</a>
+            <a href="./Docs/RegistrationForm2025.docx" target="_blank">Registration Form</a>
+            <a href="./Docs/Agenda2024.pdf" target="_blank">Competition Agenda</a>
+        </section>
+        <section id="email">
+            <h3>Please contact<a href="mailto:lutonRC@Leonardo.com">lutonRC@Leonardo.com</a>for further questions.</h3>
+        </section>
+    </main>
+</body>
+
+<style>
+    @import url('./global.css');
+    header{
+    width: 100%;
+    height: 6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-primary);
+    padding: 0 3rem;
+    transition: height 0.5s ease-in-out;
+    }
+    header.expand {
+        height: 8rem;
+    }
+    header h1{
+        color: white;
+        line-height: 2.5rem;
+        font-size: 2rem;
+    }
+    #logo {
+        width: 14vw;
+    }
+    #back{
+        width: 14vw;
+        text-align: right;
+    }
+    body{
+        width: 100%;
+    }
+    main{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    #docs {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        justify-items: center;
+        align-items: center;
+        height: 15rem;
+        width: 100%;
+        margin: 5rem 0;
+    }
+    section a{
+        color: var(--color-primary);
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+    #email{
+        background-color: var(--color-secondary);
+        border-radius: var(--border-radius);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 7rem;
+        padding: 1.5rem;
+        width: 80%;
+        margin: 2rem 0;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+</style>
+
+<script>
+    document.getElementById('back').addEventListener('click', function (event) {
+        event.preventDefault();
+        const params = new URLSearchParams(window.location.search);
+        const school = params.get('school');
+        const key = params.get('key');
+        const newUrl = `./school-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+        window.location.href = newUrl;
+    });
+
+    window.addEventListener('load', () => {
+        const header = document.querySelector('header');
+        setTimeout(() => {
+            header.classList.add('expand');
+        }, 0); // Trigger animation immediately after page load
+    });
+</script>
+</html>

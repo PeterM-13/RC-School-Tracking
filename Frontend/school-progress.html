@@ -20,13 +20,12 @@
         <div id="progressContainer">
             <p id="schoolName">Your Progress:</p>
             <div id="progressBar">
-                <div id="progressBarFill">50%</div>
+                <div id="progressBarFill">10%</div>
             </div>
         </div>
         <div id="pagesContainer">
-            <a href="./all-progress.html">All Schools</a>
-            <a href="">Documents</a>
-            <a href="">Help</a>
+            <a id="allPropLink" href="./all-progress.html">All Schools</a>
+            <a id="docsLink" href="./documents.html">Documents & Help</a>
         </div>
     </header>
 
@@ -76,8 +75,8 @@
                 <h3>Cut the MDF to size</h3>
                 <h3>Marked, drilled & counter-sunk holes in chassis</h3>
                 <h3>Assembled the chassis</h3>
-                <h3>Dismantled both drills</h3>
                 <h3>Replaced both drill chucks with wheels</h3>
+                <h3>Dismantled both drills</h3>
                 <h3>Cut drill cases to size, drilled holes & crimped wires</h3>
                 <h3>Fitted motors to chassis</h3>
                 <h3>Fitted balancing wheels to chassis</h3>
@@ -242,6 +241,7 @@
                 }
             });
 
+            //console.log('totalCheckboxes:', totalCheckboxes);
             const progressPercentage = Math.round((checkedCheckboxes / totalCheckboxes) * 100);
             const progressBarFill = document.getElementById('progressBarFill');
             progressBarFill.style.width = `${progressPercentage}%`;
@@ -366,6 +366,31 @@
             }
         }, 5000);
 
+
+        // Adds school info to url for navigatoin
+        document.getElementById('allPropLink').addEventListener('click', function (event) {
+            event.preventDefault();
+            const params = new URLSearchParams(window.location.search);
+            const school = params.get('school');
+            const key = params.get('key');
+            const newUrl = `./all-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+            window.location.href = newUrl;
+        });
+        document.getElementById('docsLink').addEventListener('click', function (event) {
+            event.preventDefault();
+            const params = new URLSearchParams(window.location.search);
+            const school = params.get('school');
+            const key = params.get('key');
+            const newUrl = `./documents.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+            window.location.href = newUrl;
+        });
+
+        window.addEventListener('load', () => {
+            const header = document.querySelector('header');
+            setTimeout(() => {
+                header.classList.add('shrink');
+            }, 0); // Trigger animation immediately after page load
+        });
     </script>
 </body>
 </html>
