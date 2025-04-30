@@ -109,6 +109,11 @@
                 <custom-checkbox></custom-checkbox>
                 <custom-checkbox></custom-checkbox>
                 <custom-checkbox></custom-checkbox>
+                <custom-checkbox></custom-checkbox>
+                <custom-checkbox></custom-checkbox>
+                <custom-checkbox></custom-checkbox>
+                <custom-checkbox></custom-checkbox>
+                <custom-checkbox></custom-checkbox>
             </div>
             <div class="path3txt" id="path3txtR">
                 <h3 id="pcb" class="clickh3">Soldered 1st PCB</h3>
@@ -390,6 +395,16 @@
         });
 
         window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const school = urlParams.get('school');
+            const key = urlParams.get('key');
+
+            if (!school || !key || school == 'null' || key === 'null') {
+                alert('Error: Cannot find school loging details. Please login again.');
+                window.location.href = './school-login.html';
+                return;
+            }
+
             const header = document.querySelector('header');
             setTimeout(() => {
                 header.classList.add('shrink');
