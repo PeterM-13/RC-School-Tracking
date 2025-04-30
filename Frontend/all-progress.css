@@ -86,3 +86,9 @@ main{
 #expected{
     background-color: var(--color-accent);
 }
+
+@media (max-width: 800px) {
+    #logo {
+        display: none;
+    }
+}

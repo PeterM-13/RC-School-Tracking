@@ -29,6 +29,7 @@ h3{
     font-size: 1.5rem;
     letter-spacing: 2px;
     height: 2.5rem;
+    z-index: 999;
 }
 
 /* header -------------------------------------------------------------------- */
@@ -39,11 +40,12 @@ header{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-direction: row;
     background-color: var(--color-primary);
     padding: 0 3rem;
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 2000;
     transition: height 0.5s ease-in-out;
 }
 header.shrink {
@@ -309,7 +311,97 @@ h4{
     border-radius: 50%;
 }
 
-
-
-
 /* ------------------------------------------------------------------- */
+
+h3.clickh3{
+    cursor: pointer;
+}
+.picBg{
+    position: absolute;
+    width: 35rem;
+    height: 23rem;
+    z-index: 1000;
+    border-radius: 9px;
+    padding: 1rem;
+    background-color: rgb(40, 40, 40);
+    padding-top: 5rem;
+    opacity: 0; /* Start invisible */
+    pointer-events: none; /* Disable interactions when hidden */
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition */
+    transform: scale(0.95); /* Slightly shrink initially */
+}
+.picBg.show{
+    opacity: 1; /* Fully visible */
+    pointer-events: auto; /* Enable interactions */
+    transform: scale(1); /* Restore to normal size */
+}
+.picBg img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+}
+
+/* mobile message ------------------------------------------------------------------- */
+
+#mobileMessage {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 1.5rem;
+    color: white;
+    background-color: var(--color-primary);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    z-index: 3000;
+}
+
+@media (max-width: 800px) {
+    main > *:not(#mobileMessage) {
+        display: none;
+    }
+ 
+    body{
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #mobileMessage {
+        display: block;
+    }
+
+    header{
+        padding: 1rem;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        min-height: 14rem;
+    }
+    header h1{
+        line-height: 1.2rem;
+        font-size: 1rem;
+    }
+    a{
+        font-size: 1rem;
+    }
+    #logo {
+        display: none;
+    }
+    #progressContainer{
+        display: none;
+    }
+    #pagesContainer{
+        width: 50vw;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        height: 20rem;
+        margin-top: 2rem;
+    }
+}

@@ -36,10 +36,15 @@
             try {
                 const response = await fetch('http://localhost:3000/school-names'); // Replace with the actual API URL
                 const schools = await response.json();
+                schools.sort((a, b) => {
+                    if (a === 'Admin') return 1;
+                    if (b === 'Admin') return -1;
+                    return a.localeCompare(b);
+                });
                 schools.forEach(school => {
                     const option = document.createElement('option');
-                    option.value = school;  // No .id, just the string
-                    option.textContent = school; // No .name, just the string
+                    option.value = school;
+                    option.textContent = school;
                     dropdown.appendChild(option);
                 });
             } catch (error) {

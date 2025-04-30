@@ -64,7 +64,7 @@
             <h4 id="hardware">Hardware</h4>
             <svg class="pathJoin" viewBox="0 0 100 50" preserveAspectRatio="none">
                 <path d="M 5,50 C 5,25 50,25 50.2,0" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
-                <path d="M 95.2,50 C 95,25 50,25 50.2,0" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
+                <path d="M 95,50 C 95,25 50,25 50,0" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
             </svg>
             <h4 id="electronics">Electronics</h4>
         </section>
@@ -72,15 +72,15 @@
 
         <section id="progress3">
             <div class="path3txt" id="path3txtL">
-                <h3>Cut the MDF to size</h3>
-                <h3>Marked, drilled & counter-sunk holes in chassis</h3>
-                <h3>Assembled the chassis</h3>
-                <h3>Replaced both drill chucks with wheels</h3>
-                <h3>Dismantled both drills</h3>
-                <h3>Cut drill cases to size, drilled holes & crimped wires</h3>
-                <h3>Fitted motors to chassis</h3>
-                <h3>Fitted balancing wheels to chassis</h3>
-                <h3>Fitted batteries to chassis</h3>
+                <h3 id="cutmdf" class="clickh3">Cut the MDF to size</h3>
+                <h3 id="holes" class="clickh3">Drilled & counter-sunk holes in chassis</h3>
+                <h3 id="chassis" class="clickh3">Assembled the chassis</h3>
+                <h3 id="chuck" class="clickh3">Replaced both drill chucks with wheels</h3>
+                <h3 id="dsmtl" class="clickh3">Dismantled both drills</h3>
+                <h3 id="drillcut" class="clickh3">Cut drill cases to size, drilled holes & crimped wires</h3>
+                <h3 id="motors" class="clickh3">Fitted motors to chassis</h3>
+                <h3 id="balance" class="clickh3">Fitted balancing wheels to chassis</h3>
+                <h3 id="battery" class="clickh3">Fitted batteries to chassis</h3>
                 <h3>Fitted rear safety lights</h3>
             </div>
             <div class="path3ticks" id="path3ticksL">
@@ -98,7 +98,7 @@
             <span class="path" id="path3L"></span>
             <span class="path" id="path3R"></span>
             <div class="path3ticks" id="path3ticksR">
-                <custom-checkbox></custom-checkbox>
+                <custom-checkbox></custom-checkbox>                
                 <custom-checkbox></custom-checkbox>
                 <custom-checkbox></custom-checkbox>
                 <custom-checkbox></custom-checkbox>
@@ -111,15 +111,15 @@
                 <custom-checkbox></custom-checkbox>
             </div>
             <div class="path3txt" id="path3txtR">
-                <h3>Soldered 1st PCB</h3>
-                <h3>Soldered 2nd PCB</h3>
-                <h3>Made test equipment</h3>
-                <h3>Checked 1st PCB board voltages (without PIC)</h3>
-                <h3>Checked 2nd PCB board voltages (without PIC)</h3>
-                <h3>Tested 1st PCB LED (with PIC)</h3>
-                <h3>Tested 2nd PCB LED (with PIC)</h3>
-                <h3>Tested 1st PCB with motor (with PIC & driver IC)</h3>
-                <h3>Tested 2nd PCB with motor (with PIC & driver IC)</h3>
+                <h3 id="pcb" class="clickh3">Soldered 1st PCB</h3>
+                <h3 id="pcb2" class="clickh3">Soldered 2nd PCB</h3>
+                <h3 id="testEquip" class="clickh3">Made test equipment</h3>
+                <h3 id="voltages" class="clickh3">Checked 1st PCB board voltages (without PIC)</h3>
+                <h3 id="voltages2" class="clickh3">Checked 2nd PCB board voltages (without PIC)</h3>
+                <h3 id="lamptest" class="clickh3">Tested 1st PCB LED (with PIC)</h3>
+                <h3 id="lamptest2" class="clickh3">Tested 2nd PCB LED (with PIC)</h3>
+                <h3 id="motortest" class="clickh3">Tested 1st PCB with motor (with PIC & driver IC)</h3>
+                <h3 id="motortest2" class="clickh3">Tested 2nd PCB with motor (with PIC & driver IC)</h3>
                 <h3>1st PCB works!</h3>
                 <h3>2nd PCB works!</h3>
             </div>
@@ -129,7 +129,7 @@
         <section id="progress4">
             <svg class="pathJoin" viewBox="0 0 100 50" preserveAspectRatio="none">
                 <path d="M 5.2,0 C 5,25 50,25 50.2,50" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
-                <path d="M 95,0 C 95,25 50,25 50.2,50" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
+                <path d="M 95.2,0 C 95,25 50,25 50.2,50" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
             </svg>
         </section>
 
@@ -139,7 +139,7 @@
                 <h3>Fitted PCB Boards to chassis</h3>
                 <h3>Added a fuse and switch to wiring</h3>
                 <h3>Driven working chariot around!</h3>
-                <h3>Arrive at Leonardo for the competition</h3>
+                <h3>Arrived at Leonardo for the competition</h3>
             </div>
             <div class="path5ticks" id="path5ticksL">
                 <custom-checkbox></custom-checkbox>
@@ -173,6 +173,10 @@
 
 
     <div id="confetti-container"></div>
+    <div class="picBg"><img></div>
+    <div id="mobileMessage">
+        <p>Please view on desktop</p>
+    </div>
 
 
 
@@ -390,6 +394,66 @@
             setTimeout(() => {
                 header.classList.add('shrink');
             }, 0); // Trigger animation immediately after page load
+        });
+
+        document.querySelectorAll('h3.clickh3').forEach(h3 => {
+            h3.addEventListener('click', function () {
+                const picBg = document.querySelector('.picBg');
+                const img = picBg.querySelector('img');
+
+                // Toggle visibility if the same image is already displayed
+                if (img.src.includes(`${this.id}.jpeg`)) {
+                    const isVisible = picBg.classList.contains('show');
+                    picBg.classList.toggle('show', !isVisible); // Toggle the 'show' class
+                    this.style.color = isVisible ? '' : 'white'; // Reset or set text color
+                    this.style.zIndex = isVisible ? '' : '1100'; // Reset or set z-index
+
+                    // Reset checkbox z-index
+                    const index = Array.from(this.parentElement.children).indexOf(this);
+                    const checkboxParentId = this.parentElement.id === 'path3txtL' ? 'path3ticksL' : 'path3ticksR';
+                    const checkbox = document.querySelector(`#${checkboxParentId}`).children[index];
+                    checkbox.style.zIndex = isVisible ? '' : '1100'; // Reset or set z-index
+                    return;
+                }
+
+                // Update the image source
+                img.src = `./images/${this.id}.jpeg`;
+
+                // Determine alignment based on parent id
+                const rect = this.getBoundingClientRect();
+                const isLeftAligned = this.parentElement.id === 'path3txtL';
+
+                picBg.style.top = `${window.scrollY + rect.top - 10}px`; // Position below the h3
+                if (isLeftAligned) {
+                    picBg.style.left = `${window.scrollX + rect.right - 480}px`; // Align left
+                } else {
+                    picBg.style.left = `${window.scrollX + rect.left - 16 * 5}px`; // Align right
+                }
+                picBg.classList.add('show'); // Add the 'show' class for transition
+
+                // Temporarily change h3 text color and z-index
+                this.style.color = 'white';
+                this.style.zIndex = '1100';
+
+                // Highlight the corresponding checkbox
+                const index = Array.from(this.parentElement.children).indexOf(this);
+                const checkboxParentId = this.parentElement.id === 'path3txtL' ? 'path3ticksL' : 'path3ticksR';
+                const checkbox = document.querySelector(`#${checkboxParentId}`).children[index];
+                checkbox.style.zIndex = '1100';
+
+                // Reset styles for other h3 elements and checkboxes
+                document.querySelectorAll('h3.clickh3').forEach(otherH3 => {
+                    if (otherH3 !== this) {
+                        otherH3.style.color = ''; // Reset text color
+                        otherH3.style.zIndex = ''; // Reset z-index
+                    }
+                });
+                document.querySelectorAll('custom-checkbox').forEach(otherCheckbox => {
+                    if (otherCheckbox !== checkbox) {
+                        otherCheckbox.style.zIndex = ''; // Reset z-index
+                    }
+                });
+            });
         });
     </script>
 </body>
