@@ -1,0 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SchoolProgress {
+  id        Int     @id @default(autoincrement())
+  school    String
+  progress  Int[]   // Array of integers
+  password  String
+}

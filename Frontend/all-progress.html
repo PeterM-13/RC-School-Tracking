@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="all-progress.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
+    <title>Schools Progress</title>
+</head>
+<body>
+    <header>
+        <h1><span style="color: rgb(220, 56, 56);">Rampaging chariots</span><br>Construction Tracking</h1>
+        <img id="logo" src="images/logo.png" alt="Logo">
+    </header>
+
+    <main>
+       
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const progressContainer = document.getElementsByTagName('main')[0];
+
+            try {
+                const response = await fetch('http://localhost:3000/school-progress');
+                const schools = await response.json();
+
+                // Sort schools by progress percentage in descending order
+                schools.sort((a, b) => {
+                    const progressA = (a.progress.filter(p => p === 1).length / 50) * 100;
+                    const progressB = (b.progress.filter(p => p === 1).length / 50) * 100;
+                    return progressB - progressA;
+                });
+
+                schools.forEach(({ school, progress }) => {
+                    let percentage = (progress.filter(p => p === 1).length / 50) * 100;
+
+                    // Ensure percentage does not exceed 100
+                    percentage = Math.min(percentage, 100);
+
+                    const schoolDiv = document.createElement('div');
+                    schoolDiv.className = 'school-div';
+
+                    const schoolName = document.createElement('span');
+                    schoolName.className = 'school-name';
+                    schoolName.textContent = school;
+
+                    const progressBar = document.createElement('div');
+                    progressBar.className = 'progress-bar';
+
+                    const progressFill = document.createElement('div');
+                    progressFill.className = 'progress-fill';
+                    progressFill.style.width = `${percentage}%`;
+
+                    // Assign id 'expected' if the school name is 'Expected Progress'
+                    if (school === 'Expected Progress') {
+                        progressFill.id = 'expected';
+                    }
+
+                    const percentageLabel = document.createElement('span');
+                    percentageLabel.className = 'percentage-label';
+                    percentageLabel.textContent = `${Math.round(percentage)}%`;
+
+                    progressBar.appendChild(progressFill);
+                    progressBar.appendChild(percentageLabel);
+
+                    schoolDiv.appendChild(schoolName);
+                    schoolDiv.appendChild(progressBar);
+
+                    progressContainer.appendChild(schoolDiv);
+                });
+            } catch (error) {
+                console.error('Error fetching school progress:', error);
+            }
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
+    <title>School Login</title>
+</head>
+<body>
+    <header>
+        <h1><span style="color: rgb(220, 56, 56);">Rampaging chariots</span><br>Construction Tracking</h1>
+        <img id="logo" src="images/logo.png" alt="Logo">
+    </header>
+
+    <main>
+        <h2>Select your school</h2>
+        <select id="school-dropdown">
+            <option value="" disabled selected>Select a school</option>
+        </select>
+
+        <h2>Enter password</h2>
+        <input id="pswd" placeholder="Enter password">
+
+        <button id="login-button">Start Building</button>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const dropdown = document.getElementById('school-dropdown');
+            const loginButton = document.getElementById('login-button');
+            const passwordInput = document.getElementById('pswd');
+
+            try {
+                const response = await fetch('http://localhost:3000/school-names'); // Replace with the actual API URL
+                const schools = await response.json();
+                schools.forEach(school => {
+                    const option = document.createElement('option');
+                    option.value = school;  // No .id, just the string
+                    option.textContent = school; // No .name, just the string
+                    dropdown.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching schools:', error);
+            }
+
+            loginButton.addEventListener('click', async () => {
+                const selectedSchool = dropdown.value;
+                const password = passwordInput.value;
+
+                if (!selectedSchool || !password) {
+                    alert('Please select a school and enter a password.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://localhost:3000/school-password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: selectedSchool, password })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        //?school=Cottesloe&key=1234
+                        window.location.href = 'school-progress.html?school=' + selectedSchool + '&key=' + password;
+                    } else {
+                        alert('Incorrect password for selected school. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error during login:', error);
+                    alert('An error occurred. Please try again later.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

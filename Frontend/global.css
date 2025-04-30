@@ -1,0 +1,39 @@
+:root{
+    --color-primary: #3A3A3A;
+    --color-secondary: rgb(229, 229, 229);
+    --color-accent: #E93838;
+    --color-background: #f8f8f8;
+    --font-family: 'Do Hyeon', sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+    --font-spacing: 2px;
+    --border-radius: 6px;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    background-color: var(--color-background);
+    color: var(--color-primary);
+}
+h1, h2, h3, h4, h5, h6{
+    color: var(--color-primary);
+    letter-spacing: var(--font-spacing);
+}
+a {
+    color: var(--color-background);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    margin: 0 1rem;
+    text-align: center;
+}
+a:hover {
+    color: var(--color-accent);
+}
