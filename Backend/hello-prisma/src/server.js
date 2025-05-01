@@ -8,31 +8,16 @@ const prisma = new PrismaClient();
 app.use(express.json());
 
 // Enable CORS globally
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PATCH', 'OPTIONS'], // Specify allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
-}));
+// app.use(cors({
+//   origin: '*',
+//   methods: ['GET', 'POST', 'PATCH', 'OPTIONS'], // Specify allowed methods
+//   allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+// }));
 
-// Explicitly handle preflight requests
-app.use((req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    return res.sendStatus(204); // No Content
-  }
-  next();
-});
-
-// Apply CORS middleware explicitly to all routes
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
+app.use(cors({origin: 'http://peter-metcalfe.co.uk'}));
 
 // GET all school progress
-// Example URL: GET http://localhost:3000/school-progress
+// Example URL: GET http://localhost:3000/school-progress-all
 app.get('/school-progress-all', async (req, res) => {
   try {
     const schoolProgress = await prisma.schoolProgress.findMany({
