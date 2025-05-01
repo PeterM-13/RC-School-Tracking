@@ -11,14 +11,23 @@ app.use(express.json());
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PATCH', 'OPTIONS'], // Specify allowed methods
-  allowedHeaders: ['Content-Type','Authorization'], // Specify allowed headers
+  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
 }));
 
-app.options('*', cors()); // Handle preflight requests for all routes
+// Explicitly handle preflight requests
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.sendStatus(204); // No Content
+  }
+  next();
+});
 
 // GET all school progress
 // Example URL: GET http://localhost:3000/school-progress
-app.get('/school-progress', async (req, res) => {
+app.get('/school-progress-all', async (req, res) => {
   try {
     const schoolProgress = await prisma.schoolProgress.findMany({
       select: {
