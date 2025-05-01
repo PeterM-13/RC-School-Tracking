@@ -16,6 +16,7 @@ app.use((err, req, res, next) => {
 // GET all school progress
 // Example URL: GET http://localhost:3000/school-progress-all
 app.get('/school-progress-all', async (req, res) => {
+  console.log('Endpoint hit: GET /school-progress-all');
   try {
     const schoolProgress = await prisma.schoolProgress.findMany({
       select: {
@@ -32,20 +33,22 @@ app.get('/school-progress-all', async (req, res) => {
 // GET all school names
 // Example URL: GET http://localhost:3000/school-names
 app.get('/school-names', async (req, res) => {
-    try {
-      const schools = await prisma.schoolProgress.findMany({
-        select: { school: true },
-      });
-      res.json(schools.map((s) => s.school));
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch school names' });
-    }
-  });
+  console.log('Endpoint hit: GET /school-names');
+  try {
+    const schools = await prisma.schoolProgress.findMany({
+      select: { school: true },
+    });
+    res.json(schools.map((s) => s.school));
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch school names' });
+  }
+});
 
 // POST school password
 // Example URL: POST http://localhost:3000/school-password
 // Example Body: { "name": "exampleSchoolName", "password": "examplePassword" }
 app.post('/school-password', async (req, res) => {
+  console.log('Endpoint hit: POST /school-password');
   const { name, password } = req.body;
   try {
     const school = await prisma.schoolProgress.findFirst({
@@ -66,6 +69,7 @@ app.post('/school-password', async (req, res) => {
 // GET a school's progress
 // Example URL: GET http://localhost:3000/school-progress/exampleSchoolName
 app.get('/school-progress/:name', async (req, res) => {
+  console.log(`Endpoint hit: GET /school-progress/${req.params.name}`);
   const { name } = req.params;
   try {
     const schoolProgress = await prisma.schoolProgress.findFirst({
@@ -91,6 +95,7 @@ app.get('/school-progress/:name', async (req, res) => {
 // Example URL: PATCH http://localhost:3000/school-progress
 // Example Body: { "name": "exampleSchoolName", "progress": [75, 80, 90], "password":"1234" }
 app.patch('/school-progress', async (req, res) => {
+  console.log('Endpoint hit: PATCH /school-progress');
   const { name, progress, password } = req.body;
   try {
     if (!Array.isArray(progress)) {
