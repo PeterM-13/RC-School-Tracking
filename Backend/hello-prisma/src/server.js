@@ -6,15 +6,12 @@ const cors = require('cors');
 const prisma = new PrismaClient();
 
 app.use(cors({origin: 'https://peter-metcalfe.co.uk'}));
+
 app.use(express.json());
-
-// Enable CORS globally
-// app.use(cors({
-//   origin: '*',
-//   methods: ['GET', 'POST', 'PATCH', 'OPTIONS'], // Specify allowed methods
-//   allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
-// }));
-
+app.use((err, req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'https://peter-metcalfe.co.uk');
+    res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+  });
 
 // GET all school progress
 // Example URL: GET http://localhost:3000/school-progress-all
@@ -31,6 +28,19 @@ app.get('/school-progress-all', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch school progress' });
   }
 });
+
+// GET all school names
+// Example URL: GET http://localhost:3000/school-names
+app.get('/school-names', async (req, res) => {
+    try {
+      const schools = await prisma.schoolProgress.findMany({
+        select: { school: true },
+      });
+      res.json(schools.map((s) => s.school));
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch school names' });
+    }
+  });
 
 // POST school password
 // Example URL: POST http://localhost:3000/school-password
@@ -74,19 +84,6 @@ app.get('/school-progress/:name', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch school progress' });
-  }
-});
-
-// GET all school names
-// Example URL: GET http://localhost:3000/school-names
-app.get('/school-names', async (req, res) => {
-  try {
-    const schools = await prisma.schoolProgress.findMany({
-      select: { school: true },
-    });
-    res.json(schools.map((s) => s.school));
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch school names' });
   }
 });
 
