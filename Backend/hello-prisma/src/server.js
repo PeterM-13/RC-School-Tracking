@@ -11,8 +11,10 @@ app.use(express.json());
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PATCH', 'OPTIONS'], // Specify allowed methods
-  allowedHeaders: ['Content-Type'], // Specify allowed headers
+  allowedHeaders: ['Content-Type','Authorization'], // Specify allowed headers
 }));
+
+app.options('*', cors()); // Handle preflight requests for all routes
 
 // GET all school progress
 // Example URL: GET http://localhost:3000/school-progress
@@ -140,5 +142,5 @@ app.patch('/school-progress', async (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on port: ${PORT}`);
 });

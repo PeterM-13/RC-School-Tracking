@@ -25,6 +25,7 @@
         <input id="pswd" placeholder="Enter password">
 
         <button id="login-button">Start Building</button>
+        <p id="loading">Loading, please wait...</p>
     </main>
 
     <script>
@@ -32,9 +33,18 @@
             const dropdown = document.getElementById('school-dropdown');
             const loginButton = document.getElementById('login-button');
             const passwordInput = document.getElementById('pswd');
+            const loadingElement = document.getElementById('loading');
+            let loadingDots = 0;
+
+            setInterval(() => {
+                if (loadingElement.style.display === 'block') {
+                    loadingDots = (loadingDots + 1) % 4;
+                    loadingElement.textContent = 'Loading, please wait' + '.'.repeat(loadingDots);
+                }
+            }, 500);
 
             try {
-                const response = await fetch('http://localhost:3000/school-names'); // Replace with the actual API URL
+                const response = await fetch('https://rc-school-tracking.onrender.com/school-names');
                 const schools = await response.json();
                 schools.sort((a, b) => {
                     if (a === 'Admin') return 1;
@@ -55,13 +65,16 @@
                 const selectedSchool = dropdown.value;
                 const password = passwordInput.value;
 
+                
                 if (!selectedSchool || !password) {
                     alert('Please select a school and enter a password.');
                     return;
                 }
 
+                document.getElementById('loading').style.display = 'block';
+
                 try {
-                    const response = await fetch('http://localhost:3000/school-password', {
+                    const response = await fetch('https://rc-school-tracking.onrender.com/school-password', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -74,11 +87,13 @@
                         //?school=Cottesloe&key=1234
                         window.location.href = 'school-progress.html?school=' + selectedSchool + '&key=' + password;
                     } else {
+                        document.getElementById('loading').style.display = 'none';
                         alert('Incorrect password for selected school. Please try again.');
                     }
                 } catch (error) {
                     console.error('Error during login:', error);
                     alert('An error occurred. Please try again later.');
+                    document.getElementById('loading').style.display = 'none';
                 }
             });
         });

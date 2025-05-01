@@ -81,6 +81,12 @@ h2{
     background-color: rgb(192, 24, 24);
 }
 
+#loading{
+    padding-top: 1rem;
+    text-align: center;
+    width: 100%;
+    display: none;
+}
 
 
 @media (max-width: 800px) {

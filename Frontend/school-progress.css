@@ -315,6 +315,11 @@ h4{
 
 h3.clickh3{
     cursor: pointer;
+    
+}
+h3.clickh3:hover{
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
 }
 .picBg{
     position: absolute;
@@ -323,7 +328,7 @@ h3.clickh3{
     z-index: 1000;
     border-radius: 9px;
     padding: 1rem;
-    background-color: rgb(40, 40, 40);
+    background-color: rgb(60, 60, 60);
     padding-top: 5rem;
     opacity: 0; /* Start invisible */
     pointer-events: none; /* Disable interactions when hidden */
