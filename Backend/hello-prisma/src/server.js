@@ -1,10 +1,11 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const cors = require('cors');
 
 const app = express();
+const cors = require('cors');
 const prisma = new PrismaClient();
 
+app.use(cors({origin: 'https://peter-metcalfe.co.uk'}));
 app.use(express.json());
 
 // Enable CORS globally
@@ -14,7 +15,6 @@ app.use(express.json());
 //   allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
 // }));
 
-app.use(cors({origin: 'http://peter-metcalfe.co.uk'}));
 
 // GET all school progress
 // Example URL: GET http://localhost:3000/school-progress-all

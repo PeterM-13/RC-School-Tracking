@@ -35,15 +35,17 @@
             const passwordInput = document.getElementById('pswd');
             const loadingElement = document.getElementById('loading');
             let loadingDots = 0;
+            const errorMessage = 'LOADING ERROR. Please try again later.';
 
             setInterval(() => {
-                if (loadingElement.style.display === 'block') {
+                if (loadingElement.style.display === 'block' && loadingElement.textContent !== errorMessage) {
                     loadingDots = (loadingDots + 1) % 4;
                     loadingElement.textContent = 'Loading, please wait' + '.'.repeat(loadingDots);
                 }
             }, 500);
-            document.getElementById('loading').style.display = 'block';
+
             try {
+                loadingElement.style.display = 'block';
                 const response = await fetch('https://rc-school-tracking.onrender.com/school-names');
                 const schools = await response.json();
                 schools.sort((a, b) => {
@@ -57,12 +59,13 @@
                     option.textContent = school;
                     dropdown.appendChild(option);
                 });
+                loadingElement.style.display = 'none';
             } catch (error) {
                 console.error('Error fetching schools:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('loading').textContent = 'LOADING ERROR!';
+                loadingElement.style.display = 'block';
+                loadingElement.textContent = errorMessage;
             }
-
+            
             loginButton.addEventListener('click', async () => {
                 const selectedSchool = dropdown.value;
                 const password = passwordInput.value;
@@ -87,13 +90,13 @@
                         //?school=Cottesloe&key=1234
                         window.location.href = 'school-progress.html?school=' + selectedSchool + '&key=' + password;
                     } else {
-                        document.getElementById('loading').style.display = 'none';
+                        loadingElement.style.display = 'none';
                         alert('Incorrect password for selected school. Please try again.');
                     }
                 } catch (error) {
                     console.error('Error during login:', error);
                     alert('An error occurred. Please try again later.');
-                    document.getElementById('loading').style.display = 'none';
+                    loadingElement.style.display = 'none';
                 }
             });
         });
