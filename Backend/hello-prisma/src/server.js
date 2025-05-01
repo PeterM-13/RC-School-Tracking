@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 app.use(express.json());
 
-// Enable CORS with specific settings
+// Enable CORS globally
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PATCH', 'OPTIONS'], // Specify allowed methods
@@ -22,6 +22,12 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return res.sendStatus(204); // No Content
   }
+  next();
+});
+
+// Apply CORS middleware explicitly to all routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
   next();
 });
 
