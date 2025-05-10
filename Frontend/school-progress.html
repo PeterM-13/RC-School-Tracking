@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="school-progress.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
     <title>School Progress</title>
@@ -16,7 +17,6 @@
 
     <header>
         <h1><span style="color: rgb(220, 56, 56);">Rampaging chariots</span><br>Construction Tracking</h1>
-        <!--<img id="logo" src="images/logo.png" alt="Logo">-->
         <div id="progressContainer">
             <p id="schoolName">Your Progress:</p>
             <div id="progressBar">
@@ -175,7 +175,7 @@
     <div id="confetti-container"></div>
     <div class="picBg"><img></div>
     <div id="mobileMessage">
-        <p>Please view on desktop</p>
+        <p>Please view full content on desktop</p>
     </div>
 
 
@@ -234,7 +234,7 @@
         customElements.define('custom-checkbox', CustomCheckbox);
 
         function updateProgressBar() {
-            const totalCheckboxes = document.querySelectorAll('custom-checkbox').length;
+            const totalCheckboxes = document.querySelectorAll('custom-checkbox').length || 30;
             let checkedCheckboxes = 0;
 
             // Count checkboxes with the 'checked' class in their shadow DOM
@@ -245,7 +245,7 @@
                 }
             });
 
-            //console.log('totalCheckboxes:', totalCheckboxes);
+            console.log('totalCheckboxes:', totalCheckboxes);
             const progressPercentage = Math.round((checkedCheckboxes / totalCheckboxes) * 100);
             const progressBarFill = document.getElementById('progressBarFill');
             progressBarFill.style.width = `${progressPercentage}%`;

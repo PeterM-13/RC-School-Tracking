@@ -5,7 +5,7 @@ const app = express();
 const cors = require('cors');
 const prisma = new PrismaClient();
 
-app.use(cors({origin: 'https://peter-metcalfe.co.uk'}));
+app.use(cors({ origin: ['https://peter-metcalfe.co.uk', 'https://leonardo-rc.com'] }));
 
 app.use(express.json());
 app.use((err, req, res, next) => {

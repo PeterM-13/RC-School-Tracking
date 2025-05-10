@@ -352,14 +352,14 @@ h3.clickh3:hover{
 #mobileMessage {
     display: none;
     position: fixed;
-    top: 50%;
+    top: 70%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     font-size: 1.5rem;
     color: white;
     background-color: var(--color-primary);
-    padding: 2rem;
+    padding: 1rem;
     border-radius: var(--border-radius);
     z-index: 3000;
 }
@@ -374,7 +374,6 @@ h3.clickh3:hover{
         justify-content: flex-start;
         align-items: center;
         flex-direction: column;
-        overflow: hidden;
     }
 
     #mobileMessage {
@@ -386,7 +385,9 @@ h3.clickh3:hover{
         flex-direction: column;
         align-items: center;
         justify-content: space-around;
-        min-height: 14rem;
+        height: 20rem;
+        width: 100%;
+        min-height: 20rem;
     }
     header h1{
         line-height: 1.2rem;
@@ -399,14 +400,18 @@ h3.clickh3:hover{
         display: none;
     }
     #progressContainer{
-        display: none;
+        width: 100%;
+        justify-content: space-between;
+        padding: 4rem 0;
+    }
+    #progressBar{
+        width: 80vw;
     }
     #pagesContainer{
-        width: 50vw;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
-        height: 20rem;
-        margin-top: 2rem;
+       width: 100%;
+    }
+    .picBg{
+        width: 5rem;
+        height: 3rem;
     }
 }

@@ -91,4 +91,11 @@ main{
     #logo {
         display: none;
     }
+    header h1{
+        line-height: 1.6rem;
+        font-size: 1.2rem;
+    }
+    .school-name {
+        font-size: 1.2rem;
+    }
 }
