@@ -55,6 +55,7 @@ header h1{
     color: white;
     line-height: 2rem;
     font-size: 1.8rem;
+    width: 28vw;
 }
 #logo {
     height: 2vw;
@@ -64,6 +65,7 @@ header h1{
     justify-content: center;
     align-items: center;
     flex-direction: row;
+    width: 30vw;
 }
 p{
     color: var(--color-background);
@@ -73,7 +75,7 @@ p{
 #progressBar{
     background-color: var(--color--primary);
     height: 2rem;
-    width: 22vw;
+    width: 100%;
     border: 0.2rem solid var(--color-background);
     border-radius: var(--border-radius);
 }
@@ -91,10 +93,13 @@ p{
 }
 #pagesContainer{
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     flex-direction: row;
-    width: 25vw;
+    width: 30vw;
+}
+#docsLink{
+    margin-left: 1.5rem;
 }
 
 /* main ---------------------------------------------------------------------- */
@@ -118,7 +123,24 @@ main{
     justify-content: center;
     align-items: center;
     flex-direction: row;
-    margin: 3rem;
+    margin-top: 3rem;
+}
+#tickTitle img{
+    scale: 1.2;
+    padding-right:0.2rem;
+}
+#clickTitle{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: 3rem;
+    margin-top: 1.5rem;
+}
+#cursor{
+    height: 2.5rem;
+    margin-bottom: 0.75rem;
+    padding-right: 0.75rem;;
 }
 
 /* fist path section --------------------------------------------------------- */
@@ -274,7 +296,7 @@ h4{
     justify-content: space-evenly;
 }
 #path5{
-    scale: 1.0 1.03;
+    scale: 1.03 1.05;
 }
 
 /* ------------------------------------------------------------------- */
@@ -323,6 +345,8 @@ h3.clickh3:hover{
 }
 .picBg{
     position: absolute;
+    top: 0;
+    left: 0;
     width: 35rem;
     height: 23rem;
     z-index: 1000;
@@ -333,7 +357,7 @@ h3.clickh3:hover{
     opacity: 0; /* Start invisible */
     pointer-events: none; /* Disable interactions when hidden */
     transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition */
-    transform: scale(0.95); /* Slightly shrink initially */
+    transform: scale(0.95) translate(0px, 0px); /* Slightly shrink initially */
 }
 .picBg.show{
     opacity: 1; /* Fully visible */

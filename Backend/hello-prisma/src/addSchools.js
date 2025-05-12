@@ -17,6 +17,7 @@ async function main() {
     "St Clement Danes",
     "Lealands",
     "Chiltern Academy",
+    "Shenley Brook End"
   ];
 
   const passwords = [
@@ -34,6 +35,7 @@ async function main() {
     "stclementdanes88990",
     "lealands33445",
     "chilternacademy66778",
+    "shenleybrookend91402"
   ];
 
   for (let i = 0; i < schools.length; i++) {

@@ -1,3 +1,6 @@
+## /CD
+`cd ./Backend/hello-prisma`
+
 ## Start Server
 `node src/server.js`
 `npx nodemon src/server.js`

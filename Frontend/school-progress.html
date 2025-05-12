@@ -37,25 +37,29 @@
                 <img class="tick" src="images/tick.png" alt="Tick">
                 <h2>Tick each step once complete</h2>
             </div>
+            <div id="clickTitle">
+                <img id="cursor" src="images/cursor.png" alt="Cursor press">
+                <h2>Click each title to view image</h2>
+            </div>
             <span class="terminal">Start</span>
         </section>
 
 
         <section id="progress1">
             <div class="path1txt" id="path1txtL">
-                <h3>Formed a team</h3>
-                <h3>Check components list &<br>identified any missing parts</h3>
+                <h3 id="team" class="clickh3">Formed a team</h3>
+                <h3 id="parts" class="clickh3">Check components list &<br>identified any missing parts</h3>
             </div>
-            <div class="path1ticks">
+            <div class="path1ticks"  id="path1ticksL">
                 <custom-checkbox></custom-checkbox>
                 <custom-checkbox></custom-checkbox>
             </div>
             <span class="path"></span>
-            <div class="path1ticks">
+            <div class="path1ticks"  id="path1ticksR">
                 <custom-checkbox/>
             </div>
             <div class="path1txt" id="path1txtR">
-                <h3>Received the kit</h3>
+                <h3 id="kit" class="clickh3">Received the kit</h3>
             </div>
         </section>
 
@@ -64,7 +68,7 @@
             <h4 id="hardware">Hardware</h4>
             <svg class="pathJoin" viewBox="0 0 100 50" preserveAspectRatio="none">
                 <path d="M 5,50 C 5,25 50,25 50.2,0" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
-                <path d="M 95,50 C 95,25 50,25 50,0" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
+                <path d="M 94.8,50 C 95,25 50,25 50,0" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
             </svg>
             <h4 id="electronics">Electronics</h4>
         </section>
@@ -72,16 +76,16 @@
 
         <section id="progress3">
             <div class="path3txt" id="path3txtL">
-                <h3 id="cutmdf" class="clickh3">Cut the MDF to size</h3>
-                <h3 id="holes" class="clickh3">Drilled & counter-sunk holes in chassis</h3>
-                <h3 id="chassis" class="clickh3">Assembled the chassis</h3>
+                <h3 id="cutmdf" class="clickh3">Cut & drilled & couter-sunk holdes in the MDF wood</h3>
+                <h3 id="alum" class="clickh3">Cut & drilled & counter-sunk holes in aluminium brackets</h3>
+                <h3 id="chassis" class="clickh3">Fully assembled the chassis</h3>
                 <h3 id="chuck" class="clickh3">Replaced both drill chucks with wheels</h3>
                 <h3 id="dsmtl" class="clickh3">Dismantled both drills</h3>
                 <h3 id="drillcut" class="clickh3">Cut drill cases to size, drilled holes & crimped wires</h3>
                 <h3 id="motors" class="clickh3">Fitted motors to chassis</h3>
                 <h3 id="balance" class="clickh3">Fitted balancing wheels to chassis</h3>
                 <h3 id="battery" class="clickh3">Fitted batteries to chassis</h3>
-                <h3>Fitted rear safety lights</h3>
+                <h3 id="rear" class="clickh3">Fitted rear safety lights & tow hook</h3>
             </div>
             <div class="path3ticks" id="path3ticksL">
                 <custom-checkbox></custom-checkbox>
@@ -120,26 +124,26 @@
                 <h3 id="lamptest2" class="clickh3">Tested 2nd PCB LED (with PIC)</h3>
                 <h3 id="motortest" class="clickh3">Tested 1st PCB with motor (with PIC & driver IC)</h3>
                 <h3 id="motortest2" class="clickh3">Tested 2nd PCB with motor (with PIC & driver IC)</h3>
-                <h3>1st PCB works!</h3>
-                <h3>2nd PCB works!</h3>
+                <h3 id="pcbw1" class="clickh3">1st PCB works!</h3>
+                <h3 id="pcbw2" class="clickh3">2nd PCB works!</h3>
             </div>
         </section>
 
 
         <section id="progress4">
             <svg class="pathJoin" viewBox="0 0 100 50" preserveAspectRatio="none">
-                <path d="M 5.2,0 C 5,25 50,25 50.2,50" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
-                <path d="M 95.2,0 C 95,25 50,25 50.2,50" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
+                <path d="M 5.2,0 C 5,25 50,25 50,50" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
+                <path d="M 94.8,0 C 95,25 50,25 50,50" fill="none" stroke="#3A3A3A" stroke-width="4.9"/>
             </svg>
         </section>
 
 
         <section id="progress5">
             <div class="path5txt" id="path5txtL">
-                <h3>Fitted PCB Boards to chassis</h3>
-                <h3>Added a fuse and switch to wiring</h3>
-                <h3>Driven working chariot around!</h3>
-                <h3>Arrived at Leonardo for the competition</h3>
+                <h3 id="pcbs" class="clickh3">Fitted PCB Boards to chassis</h3>
+                <h3 id="fuse" class="clickh3">Added a fuse and switch to wiring</h3>
+                <h3 id="drive" class="clickh3">Driven working chariot around!</h3>
+                <h3 id="site" class="clickh3">Arrived at Leonardo on the 28th of June for the competition</h3>
             </div>
             <div class="path5ticks" id="path5ticksL">
                 <custom-checkbox></custom-checkbox>
@@ -154,9 +158,9 @@
                 <custom-checkbox></custom-checkbox>
             </div>
             <div class="path5txt" id="path5txtR">
-                <h3>Fitted Radio Receiver to chassis</h3>
-                <h3>Adjusted remote controller trim</h3>
-                <h3>Performed the M.O.T.</h3>       
+                <h3 id="radio" class="clickh3">Fitted Radio Receiver to chassis</h3>
+                <h3 id="trim" class="clickh3">Adjusted remote controller trim</h3>
+                <h3 id="mot" class="clickh3">Performed the M.O.T.</h3>       
             </div>
         </section>
 
@@ -395,8 +399,8 @@
             const key = urlParams.get('key');
 
             if (!school || !key || school == 'null' || key === 'null') {
-                alert('Error: Cannot find school loging details. Please login again.');
-                window.location.href = './school-login.html';
+                alert('Error: Cannot find school login details. Please login again.');
+                window.location.href = './index.html';
                 return;
             }
 
@@ -420,7 +424,8 @@
 
                     // Reset checkbox z-index
                     const index = Array.from(this.parentElement.children).indexOf(this);
-                    const checkboxParentId = this.parentElement.id === 'path3txtL' ? 'path3ticksL' : 'path3ticksR';
+                    //const checkboxParentId = this.parentElement.id === 'path3txtL' ? 'path3ticksL' : 'path3ticksR';
+                    const checkboxParentId = this.parentElement.id.replace('txt', 'ticks'); 
                     const checkbox = document.querySelector(`#${checkboxParentId}`).children[index];
                     checkbox.style.zIndex = isVisible ? '' : '1100'; // Reset or set z-index
                     return;
@@ -432,13 +437,20 @@
                 // Determine alignment based on parent id
                 const rect = this.getBoundingClientRect();
                 const isLeftAligned = this.parentElement.id === 'path3txtL';
+                const isRightAligned = this.parentElement.id.includes('R');
 
-                picBg.style.top = `${window.scrollY + rect.top - 10}px`; // Position below the h3
+                const top = window.scrollY + rect.top - 10;
+                let left;
                 if (isLeftAligned) {
-                    picBg.style.left = `${window.scrollX + rect.right - 480}px`; // Align left
+                    left = window.scrollX + rect.right - 480;
+                } else if (isRightAligned) {
+                    left = window.scrollX + rect.left - 16 * 5;
                 } else {
-                    picBg.style.left = `${window.scrollX + rect.left - 16 * 5}px`; // Align right
+                    left = window.scrollX + rect.right - 16 * 30;
                 }
+
+                // Set transform instead of top/left
+                picBg.style.transform = `scale(1) translate(${left}px, ${top}px)`;
                 picBg.classList.add('show'); // Add the 'show' class for transition
 
                 // Temporarily change h3 text color and z-index
@@ -447,7 +459,7 @@
 
                 // Highlight the corresponding checkbox
                 const index = Array.from(this.parentElement.children).indexOf(this);
-                const checkboxParentId = this.parentElement.id === 'path3txtL' ? 'path3ticksL' : 'path3ticksR';
+                const checkboxParentId = this.parentElement.id.replace('txt', 'ticks'); 
                 const checkbox = document.querySelector(`#${checkboxParentId}`).children[index];
                 checkbox.style.zIndex = '1100';
 
