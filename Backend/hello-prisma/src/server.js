@@ -13,6 +13,15 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
   });
 
+app.get('/test', async (req, res) => {
+  console.log('Endpoint hit: GET /test');
+  try {
+    res.status(200).json({ success: 'API Awake!' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch school progress' });
+  }
+});
+
 // GET all school progress
 // Example URL: GET http://localhost:3000/school-progress-all
 app.get('/school-progress-all', async (req, res) => {
