@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
     <title>Documents</title>
 </head>
 <body>
     <header>
-        <h1><span style="color: rgb(220, 56, 56);">Rampaging chariots</span><br>Construction Tracking</h1>
+        <h1><span style="color: rgb(220, 56, 56);">Rampaging Chariots</span><br>Construction Tracking</h1>
         <img id="logo" src="images/logo.svg" alt="Logo">
         <link rel="icon" href="images/favicon.ico" type="image/x-icon">
         <a id="back" href="./school-progress.html">Back</a>
@@ -22,7 +26,7 @@
             <a href="./Docs/RegistrationForm2025.docx" target="_blank">Registration Form</a>
             <a href="./Docs/Agenda2024.pdf" target="_blank">Competition Agenda</a>
             <a href="https://uk.leonardo.com/en/people/life-at-leonardo/education/rampaging-chariots" target="_blank">Leonardo RC Website</a>
-            <a href="https://www.rampagingchariots.org.uk/" target="_blank">Original RC Website</a>
+            <a href="https://www.rampagingchariots.org.uk/" target="_blank">Rampaging Chariots Guild Website</a>
         </section>
         <section id="email">
             <h3>Please contact<a href="mailto:LutonRC@Leonardo.com">LutonRC@Leonardo.com</a>with further questions</h3>
@@ -42,13 +46,10 @@
     padding: 0 3rem;
     transition: height 0.5s ease-in-out;
     }
-    header.expand {
-        height: 8rem;
-    }
     header h1{
         color: white;
-        line-height: 2.5rem;
-        font-size: 2rem;
+        line-height: 2rem;
+        font-size: 1.8rem;
     }
     #logo {
         width: 14vw;
@@ -138,13 +139,6 @@
         const key = params.get('key');
         const newUrl = `./school-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
         window.location.href = newUrl;
-    });
-
-    window.addEventListener('load', () => {
-        const header = document.querySelector('header');
-        setTimeout(() => {
-            header.classList.add('expand');
-        }, 0); // Trigger animation immediately after page load
     });
 </script>
 </html>
