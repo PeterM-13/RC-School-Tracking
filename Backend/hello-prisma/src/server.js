@@ -9,7 +9,7 @@ app.use(cors({ origin: ['https://peter-metcalfe.co.uk', 'https://leonardo-rc.com
 
 app.use(express.json());
 app.use((err, req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://peter-metcalfe.co.uk');
+    res.setHeader('Access-Control-Allow-Origin', 'https://leonardo-rc.com');
     res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
   });
 
