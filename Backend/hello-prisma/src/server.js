@@ -5,11 +5,11 @@ const app = express();
 const cors = require('cors');
 const prisma = new PrismaClient();
 
-app.use(cors({ origin: ['https://peter-metcalfe.co.uk', 'https://leonardo-rc.com'] }));
+app.use(cors({ origin: ['https://peter-metcalfe.co.uk', 'https://leonardo-rc.com', 'http://127.0.0.1:5500'] }));
 
 app.use(express.json());
 app.use((err, req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://leonardo-rc.com');
+    res.setHeader('Access-Control-Allow-Origin', 'https://leonardo-rc.com', 'http://127.0.0.1:5500');
     res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
   });
 
