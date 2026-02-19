@@ -324,3 +324,194 @@ const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`);
 });
+
+// GET comments for a school
+// Example: GET /comments?school-name=exampleSchoolName&key=1234
+app.get('/comments', async (req, res) => {
+  console.log('Endpoint hit: GET /comments');
+  const { 'school-name': name, key } = req.query;
+  try {
+    if (!name || !key) {
+      return res.status(400).json({ error: 'School name and key are required' });
+    }
+    const school = await prisma.schoolProgress.findFirst({
+      where: {
+        school: { equals: name, mode: 'insensitive' },
+        password: key,
+      },
+      select: { comments: true },
+    });
+    if (!school) {
+      return res.status(404).json({ error: 'School not found or incorrect key' });
+    }
+    res.json({ comments: school.comments || [] });
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'Failed to fetch comments' });
+  }
+});
+
+// POST a new comment
+// Example: POST /comment { school-name, school-key, text, admin-key (optional) }
+app.post('/comment', async (req, res) => {
+  console.log('Endpoint hit: POST /comment');
+  const { 'school-name': name, 'school-key': key, text, 'admin-key': adminKey } = req.body;
+  try {
+    if (!name || !key || !text) {
+      return res.status(400).json({ error: 'School name, key, and text are required' });
+    }
+    // Find the school
+    const school = await prisma.schoolProgress.findFirst({
+      where: {
+        school: { equals: name, mode: 'insensitive' },
+        password: key,
+      },
+      select: { id: true, comments: true },
+    });
+    if (!school) {
+      return res.status(404).json({ error: 'School not found or incorrect key' });
+    }
+    const sender = adminKey ? 'leonardo' : 'school';
+    const comments = Array.isArray(school.comments) ? school.comments : [];
+    const newIndex = comments.length > 0 ? comments.length : 0;
+    const newComment = { index: newIndex, sender, text, viewed: false };
+    const updatedComments = [...comments, newComment];
+    await prisma.schoolProgress.update({
+      where: { id: school.id },
+      data: { comments: updatedComments },
+    });
+    res.status(201).json({ success: true, comment: newComment });
+  } catch (error) {
+    console.error('Error posting comment:', error);
+    res.status(500).json({ error: 'Failed to post comment' });
+  }
+});
+
+// DELETE a comment by index
+// Example: DELETE /comment { school-name, school-key, comment-index }
+app.delete('/comment', async (req, res) => {
+  console.log('Endpoint hit: DELETE /comment');
+  const { 'school-name': name, 'school-key': key, 'comment-index': commentIndex } = req.body;
+  try {
+    if (!name || !key || commentIndex === undefined) {
+      return res.status(400).json({ error: 'School name, key, and comment index are required' });
+    }
+    // Find the school
+    const school = await prisma.schoolProgress.findFirst({
+      where: {
+        school: { equals: name, mode: 'insensitive' },
+        password: key,
+      },
+      select: { id: true, comments: true },
+    });
+    if (!school) {
+      return res.status(404).json({ error: 'School not found or incorrect key' });
+    }
+    let comments = Array.isArray(school.comments) ? school.comments : [];
+    const idx = parseInt(commentIndex, 10);
+    if (isNaN(idx) || idx < 0 || idx >= comments.length) {
+      return res.status(400).json({ error: 'Invalid comment index' });
+    }
+    comments = comments.filter((c) => c.index !== idx);
+    // Re-index comments
+    comments = comments.map((c, i) => ({ ...c, index: i }));
+    await prisma.schoolProgress.update({
+      where: { id: school.id },
+      data: { comments },
+    });
+    res.json({ success: true, comments });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    res.status(500).json({ error: 'Failed to delete comment' });
+  }
+});
+
+// PATCH mark comment as viewed
+// Example: PATCH /comment-viewed { school-name, key, msg-index }
+app.patch('/comment-viewed', async (req, res) => {
+  console.log('Endpoint hit: PATCH /comment-viewed');
+  const { 'school-name': name, key, 'msg-index': msgIndex } = req.body;
+  try {
+    if (!name || !key || msgIndex === undefined) {
+      return res.status(400).json({ error: 'School name, key, and message index are required' });
+    }
+    // Find the school
+    const school = await prisma.schoolProgress.findFirst({
+      where: {
+        school: { equals: name, mode: 'insensitive' },
+        password: key,
+      },
+      select: { id: true, comments: true },
+    });
+    if (!school) {
+      return res.status(404).json({ error: 'School not found or incorrect key' });
+    }
+    let comments = Array.isArray(school.comments) ? school.comments : [];
+    const idx = parseInt(msgIndex, 10);
+    if (isNaN(idx) || idx < 0 || idx >= comments.length) {
+      return res.status(400).json({ error: 'Invalid message index' });
+    }
+    // Mark the comment as viewed
+    comments[idx].viewed = true;
+    await prisma.schoolProgress.update({
+      where: { id: school.id },
+      data: { comments },
+    });
+    res.json({ success: true, comment: comments[idx] });
+  } catch (error) {
+    console.error('Error marking comment as viewed:', error);
+    res.status(500).json({ error: 'Failed to mark comment as viewed' });
+  }
+});
+
+// GET all schools with unviewed comments (admin only)
+// Example: GET /unviewed-comments?adminKey=adminPassword
+// Optional: ?sent-by=leonardo or ?sent-by=school
+app.get('/unviewed-comments', async (req, res) => {
+  console.log('Endpoint hit: GET /unviewed-comments');
+  const { 'adminKey': adminKey, 'sent-by': sentBy } = req.query;
+  try {
+    if (!adminKey) {
+      return res.status(400).json({ error: 'Admin key is required' });
+    }
+    // Verify admin key
+    const admin = await prisma.schoolProgress.findFirst({
+      where: {
+        school: { equals: 'Admin', mode: 'insensitive' },
+        password: adminKey,
+      },
+    });
+    if (!admin) {
+      return res.status(403).json({ error: 'Incorrect admin key' });
+    }
+    // Get all schools with their unviewed comment count
+    const schools = await prisma.schoolProgress.findMany({
+      where: {
+        school: { not: 'Admin' },
+      },
+      select: {
+        school: true,
+        comments: true,
+      },
+    });
+    const unviewedBySchool = {};
+    schools.forEach(({ school, comments }) => {
+      const commentArray = Array.isArray(comments) ? comments : [];
+      let filteredComments = commentArray.filter(c => c.viewed === false);
+      
+      // Filter by sender if sent-by parameter is provided
+      if (sentBy === 'leonardo' || sentBy === 'school') {
+        filteredComments = filteredComments.filter(c => c.sender === sentBy);
+      }
+      
+      const unviewedCount = filteredComments.length;
+      if (unviewedCount > 0) {
+        unviewedBySchool[school] = unviewedCount;
+      }
+    });
+    res.json(unviewedBySchool);
+  } catch (error) {
+    console.error('Error fetching unviewed comments:', error);
+    res.status(500).json({ error: 'Failed to fetch unviewed comments' });
+  }
+});

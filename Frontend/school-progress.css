@@ -379,6 +379,7 @@ h3.clickh3:hover{
     margin: 2rem;
     position: absolute;
     height: 1.8rem;
+    min-width: max-content;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -12,5 +12,5 @@ model SchoolProgress {
   school    String
   password  String
   progress  Int[]   // Array of integers
-  comments  String[]
+  comments  Json    // Array of comment objects
 }

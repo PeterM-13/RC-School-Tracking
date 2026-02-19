@@ -59,9 +59,9 @@ h2{
     letter-spacing: 2px;
     background-color: var(--color-secondary);
     outline: none;
-    }
-    #pswd:focus {
-        border-color: var(--color-primary);
+}
+#pswd:focus {
+    border-color: var(--color-primary);
 }
 
 #login-button{

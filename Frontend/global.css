@@ -38,3 +38,10 @@ a {
 a:hover {
     color: var(--color-accent);
 }
+button{
+    border: 0;
+    background: 0;
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+}

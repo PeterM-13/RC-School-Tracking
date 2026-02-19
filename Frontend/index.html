@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
-    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <title>School Login</title>
 </head>
 <body>
@@ -88,8 +88,11 @@
 
                     const result = await response.json();
                     if (result.success) {
-                        //?school=Cottesloe&key=1234
-                        window.location.href = 'school-progress.html?school=' + selectedSchool + '&key=' + password;
+                        if (selectedSchool === 'Admin') {
+                            window.location.href = 'admin.html?school=' + selectedSchool + '&key=' + password;
+                        } else {
+                            window.location.href = 'school-progress.html?school=' + selectedSchool + '&key=' + password;
+                        }
                     } else {
                         loadingElement.style.display = 'none';
                         alert('Incorrect password for selected school. Please try again.');

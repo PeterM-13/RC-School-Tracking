@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="school-progress.css">
-    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div id="pagesContainer">
-            <a id="allPropLink" href="./all-progress.html">All Schools</a>
+            <a id="allProgLink" href="./all-progress.html">All Schools</a>
             <a id="docsLink" href="./documents.html">Documents & Help</a>
         </div>
     </header>
@@ -143,7 +143,7 @@
                 <h3 id="pcbs" class="clickh3">Fitted PCB Boards to chassis<span class="tooltip">Page 50</span></h3>
                 <h3 id="fuse" class="clickh3">Added a fuse and switch to wiring<span class="tooltip">Page 52</span></h3>
                 <h3 id="drive" class="clickh3">Driven working chariot around!<span class="tooltip">Page 51</span></h3>
-                <h3 id="site" class="clickh3">Arrived at Leonardo on the 28th of June for the competition</h3>
+                <h3 id="site" class="clickh3">Arrived at Leonardo on the 27th of June for the competition</h3>
             </div>
             <div class="path5ticks" id="path5ticksL">
                 <custom-checkbox></custom-checkbox>
@@ -238,7 +238,7 @@
         customElements.define('custom-checkbox', CustomCheckbox);
 
         function updateProgressBar() {
-            const totalCheckboxes = document.querySelectorAll('custom-checkbox').length || 30;
+            const totalCheckboxes = document.querySelectorAll('custom-checkbox').length || 31;
             let checkedCheckboxes = 0;
 
             // Count checkboxes with the 'checked' class in their shadow DOM
@@ -308,6 +308,14 @@
         async function fetchSchoolProgress() {
             const urlParams = new URLSearchParams(window.location.search);
             const schoolName = urlParams.get('school');
+            const adminKey = urlParams.get('adminKey');
+            
+            // Replace "All Schools" button with back button if coming from admin
+            if (adminKey) {
+                const allProgLink = document.getElementById('allProgLink');
+                allProgLink.textContent = 'Back to Admin';
+            }
+            
             if (schoolName) {
                 const schoolNameElement = document.getElementById('schoolName');
                 schoolNameElement.textContent = `${schoolName}:`;
@@ -318,7 +326,7 @@
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                console.log(data); // Process the data as needed
+                //console.log(data); // Process the data as needed
                 updateCheckboxes(data.progress || []); // Update checkboxes with progress data or default to empty array
             } catch (error) {
                 console.error('Error fetching school progress:', error);
@@ -341,7 +349,7 @@
         }
 
         let progressHasChanged = false;
-        // Func to send data to server after 5s.
+        // Func to send data to server after 3s.
         setInterval(async () => {
             if (progressHasChanged) {
                 const checkboxes = document.querySelectorAll('custom-checkbox');
@@ -371,25 +379,42 @@
                     console.error('Error saving progress:', error);
                 }
                 progressHasChanged = false;
-            }
-        }, 5000);
+            } 
+        }, 3000);
 
+        setInterval(async () => {
+            if (!progressHasChanged) {
+                await fetchSchoolProgress();
+            }
+        }, 6000);
 
         // Adds school info to url for navigatoin
-        document.getElementById('allPropLink').addEventListener('click', function (event) {
+        document.getElementById('allProgLink').addEventListener('click', function (event) {
             event.preventDefault();
             const params = new URLSearchParams(window.location.search);
-            const school = params.get('school');
-            const key = params.get('key');
-            const newUrl = `./all-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+            const adminKey = params.get('adminKey');
+            newUrl = '';
+            if (adminKey) {
+                newUrl = `./admin.html?key=${adminKey}`;
+            } else {
+                const school = params.get('school');
+                const key = params.get('key');
+                newUrl = `./all-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+            }
             window.location.href = newUrl;
         });
         document.getElementById('docsLink').addEventListener('click', function (event) {
             event.preventDefault();
             const params = new URLSearchParams(window.location.search);
+            const adminKey = params.get('adminKey');
             const school = params.get('school');
             const key = params.get('key');
-            const newUrl = `./documents.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+            newUrl = '';
+            if (adminKey) {
+                newUrl = `./documents.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}&adminKey=${encodeURIComponent(adminKey)}`;
+            } else {
+                newUrl = `./documents.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+            }
             window.location.href = newUrl;
         });
 

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="all-progress.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
     <title>Schools Progress</title>
 </head>
@@ -31,8 +31,8 @@
 
                 // Sort schools by progress percentage in descending order
                 schools.sort((a, b) => {
-                    const progressA = (a.progress.filter(p => p === 1).length / 30) * 100;
-                    const progressB = (b.progress.filter(p => p === 1).length / 30) * 100;
+                    const progressA = (a.progress.filter(p => p === 1).length / 31) * 100;
+                    const progressB = (b.progress.filter(p => p === 1).length / 31) * 100;
 
                     // Check if progress matches "Admin" (expected progress)
                     if (a.school === 'Admin') return -1;
@@ -47,7 +47,7 @@
                 });
 
                 schools.forEach(({ school, progress }) => {
-                    let percentage = (progress.filter(p => p === 1).length / 30) * 100;
+                    let percentage = (progress.filter(p => p === 1).length / 31) * 100;
 
                     // Ensure percentage does not exceed 100
                     percentage = Math.min(percentage, 100);

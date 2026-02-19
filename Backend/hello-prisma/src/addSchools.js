@@ -44,7 +44,7 @@ async function main() {
         school: schools[i],
         password: passwords[i], // Use the corresponding password
         progress: [],
-        comments: [],
+        comments: [{"index": 0, "sender": "leonardo", "text": "Hi there! How can we help?", "viewed": false}],
       },
     });
   }
