@@ -5,11 +5,11 @@ const app = express();
 const cors = require('cors');
 const prisma = new PrismaClient();
 
-app.use(cors({ origin: ['https://peter-metcalfe.co.uk', 'https://leonardo-rc.com'] }));
+app.use(cors({ origin: ['https://peter-metcalfe.co.uk', 'https://leonardo-rc.com', 'http://127.0.0.1:5500'] }));
 
 app.use(express.json());
 app.use((err, req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://leonardo-rc.com');
+    res.setHeader('Access-Control-Allow-Origin', 'https://leonardo-rc.com', 'http://127.0.0.1:5500');
     res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
   });
 
@@ -100,6 +100,137 @@ app.get('/school-progress/:name', async (req, res) => {
   }
 });
 
+// POST create new school
+// Example URL: POST http://localhost:3000/school
+// Example Body: { "name": "exampleSchoolName", "password": "1234" }
+app.post('/school', async (req, res) => {
+  console.log('Endpoint hit: POST /school');
+  const { name, password } = req.body;
+  try {
+    if (!name || !password) {
+      return res.status(400).json({ error: 'School name and password are required' });
+    }
+
+    // Check if school already exists
+    const existingSchool = await prisma.schoolProgress.findFirst({
+      where: {
+        school: {
+          equals: name,
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    if (existingSchool) {
+      return res.status(409).json({ error: 'School already exists' });
+    }
+
+    // Create the new school
+    const newSchool = await prisma.schoolProgress.create({
+      data: {
+        school: name,
+        password,
+        progress: [],
+        comments: [],
+      },
+      select: {
+        school: true,
+        progress: true,
+        comments: true,
+      },
+    });
+
+    res.status(201).json(newSchool);
+  } catch (error) {
+    console.error('Error creating school:', error);
+    res.status(500).json({ error: 'Failed to create school' });
+  }
+});
+
+// DELETE school
+// Example URL: DELETE http://localhost:3000/school
+// Example Body: { "name": "exampleSchoolName", "password": "1234" }
+app.delete('/school', async (req, res) => {
+  console.log('Endpoint hit: DELETE /school');
+  const { name, password } = req.body;
+  try {
+    if (!name || !password) {
+      return res.status(400).json({ error: 'School name and password are required' });
+    }
+
+    // Find the school and verify password
+    const school = await prisma.schoolProgress.findFirst({
+      where: {
+        school: {
+          equals: name,
+          mode: 'insensitive',
+        },
+        password,
+      },
+      select: {
+        id: true,
+        school: true,
+      },
+    });
+
+    if (!school) {
+      return res.status(404).json({ error: 'School not found or incorrect password' });
+    }
+
+    // Delete the school
+    await prisma.schoolProgress.delete({
+      where: { id: school.id },
+    });
+
+    res.json({ success: true, message: `School "${school.school}" deleted successfully` });
+  } catch (error) {
+    console.error('Error deleting school:', error);
+    res.status(500).json({ error: 'Failed to delete school' });
+  }
+});
+
+// PATCH school password
+// Example URL: PATCH http://localhost:3000/school-password
+// Example Body: { "name": "exampleSchoolName", "currentPassword": "1234", "newPassword": "5678" }
+app.patch('/school-password', async (req, res) => {
+  console.log('Endpoint hit: PATCH /school-password');
+  const { name, currentPassword, newPassword } = req.body;
+  try {
+    if (!name || !currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'School name, current password, and new password are required' });
+    }
+
+    // Find the school and verify current password
+    const school = await prisma.schoolProgress.findFirst({
+      where: {
+        school: {
+          equals: name,
+          mode: 'insensitive',
+        },
+        password: currentPassword,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!school) {
+      return res.status(404).json({ error: 'School not found or incorrect current password' });
+    }
+
+    // Update the password
+    await prisma.schoolProgress.update({
+      where: { id: school.id },
+      data: { password: newPassword },
+    });
+
+    res.json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    res.status(500).json({ error: 'Failed to update password' });
+  }
+});
+
 // PATCH school progress
 // Example URL: PATCH http://localhost:3000/school-progress
 // Example Body: { "name": "exampleSchoolName", "progress": [75, 80, 90], "password":"1234" }
@@ -148,6 +279,44 @@ app.patch('/school-progress', async (req, res) => {
   } catch (error) {
     console.error('Error updating school progress:', error);
     res.status(500).json({ error: 'Failed to update school progress' });
+  }
+});
+
+// PATCH reset all school progress
+// Example URL: PATCH http://localhost:3000/reset-all-progress
+// Example Body: { "password": "adminPassword" }
+app.patch('/reset-all-progress', async (req, res) => {
+  console.log('Endpoint hit: PATCH /reset-all-progress');
+  const { password } = req.body;
+  try {
+    if (!password) {
+      return res.status(400).json({ error: 'Admin password is required' });
+    }
+
+    // Verify admin password
+    const admin = await prisma.schoolProgress.findFirst({
+      where: {
+        school: {
+          equals: 'Admin',
+          mode: 'insensitive',
+        },
+        password,
+      },
+    });
+
+    if (!admin) {
+      return res.status(403).json({ error: 'Incorrect admin password' });
+    }
+
+    // Update all schools' progress to empty array
+    await prisma.schoolProgress.updateMany({
+      data: { progress: [] },
+    });
+
+    res.json({ success: true, message: 'All school progress has been reset' });
+  } catch (error) {
+    console.error('Error resetting all progress:', error);
+    res.status(500).json({ error: 'Failed to reset all progress' });
   }
 });
 
