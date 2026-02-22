@@ -85,7 +85,7 @@
         } else {
             message.className = "leonardo-message";
             const icon = document.createElement('img');
-            icon.src = 'icons/leonardoIcon.svg';
+            icon.src = 'icons/LeonardoIcon.svg';
             icon.alt = 'Leonardo Icon';
             icon.id = 'leonardo-icon';
             message.appendChild(icon);
@@ -132,8 +132,12 @@
         
         // Change title based on adminKey
         if (adminKey) {
-            document.querySelector('#Messages h1').textContent = 'Contact School';
+            const capitalizedSchool = school.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+            document.querySelector('#Messages h1').textContent = `Contact ${capitalizedSchool}`;
             document.querySelector('#Messages p').textContent = 'Respond to messages from your school here.';
+        } else {
+            document.querySelector('#Messages h1').textContent = `Contact Leonardo`;
+            document.querySelector('#Messages p').textContent = 'Send us a message, We will respond as soon as we can.';
         }
         
         if (!key) return;
