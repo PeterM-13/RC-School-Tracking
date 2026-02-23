@@ -103,6 +103,20 @@
                     loadingElement.style.display = 'none';
                 }
             });
+
+            passwordInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    loginButton.click();
+                }
+            });
+
+            dropdown.addEventListener('change', () => {
+                const selectedSchool = dropdown.value;
+                if (selectedSchool && !passwordInput.value.trim() && selectedSchool !== 'Admin') {
+                    passwordInput.value = selectedSchool.replace(/\s+/g, '').toLowerCase();
+                }
+            });
         });
     </script>
 </body>
