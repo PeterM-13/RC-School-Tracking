@@ -40,7 +40,7 @@
             <a href="./Docs/Rules2025.pdf" target="_blank" class="icon"><img src="icons/rules.png" alt="Rules Icon">Rules</a>
             <a href="./Docs/Controller Supplement.pdf" target="_blank" class="icon"><img src="icons/controller.png" alt="Controller Supplement Icon">Controller Supplement</a>
             <a href="./Docs/RampagingChariotsIntroduction.pdf" target="_blank" class="icon"><img src="icons/pdf.png" alt="Introduction PowerPoint Icon">Introduction PowerPoint</a>
-            <a href="./Docs/RegistrationForm2026.docx" target="_blank" class="icon"><img src="icons/register.png" alt="Registration Form Icon">Registration Form</a>
+            <a href="./Docs/RegistrationForm2026.pdf" target="_blank" class="icon"><img src="icons/register.png" alt="Registration Form Icon">Registration Form</a>
             <a href="./Docs/MOT.pdf" target="_blank" class="icon"><img src="icons/mot.png" alt="M.O.T. Icon">M.O.T.</a>
             <a href="./Docs/Agenda2024.pdf" target="_blank" class="icon"><img src="icons/agenda.png" alt="Competition Agenda Icon">Competition Agenda</a>
             <a href="https://youtu.be/sWb2BGhMnoA" target="_blank" class="icon"><img src="icons/youtube.png" alt="YouTube Video Icon">YouTube Video</a>
@@ -123,15 +123,11 @@
         const key = params.get('key');
         const adminKey = params.get('adminKey');
         
-        // Hide message section if no school parameter
-        if (!school) {
+        if (adminKey) {
+            // Hide message section if no school parameter
             document.getElementById('Messages').style.display = 'none';
             document.getElementById('docs').style.width = '100%';
-            return;
-        }
-        
-        // Change title based on adminKey
-        if (adminKey) {
+            // Change title based on adminKey
             const capitalizedSchool = school.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
             document.querySelector('#Messages h1').textContent = `Contact ${capitalizedSchool}`;
             document.querySelector('#Messages p').textContent = 'Respond to messages from your school here.';
