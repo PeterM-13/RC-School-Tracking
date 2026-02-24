@@ -11,6 +11,7 @@ const prisma = new PrismaClient();
 const ALLOWED_ORIGINS = [
   'https://peter-metcalfe.co.uk',
   'https://leonardo-rc.com',
+  'https://www.leonardo-rc.com',
   'http://127.0.0.1:5500'
 ];
 

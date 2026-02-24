@@ -42,6 +42,7 @@
             <span class="terminal">Start</span>
         </section>
 
+        <section id="mobileProgress" aria-label="Progress steps"></section>
 
         <section id="progress1">
             <div class="path1txt" id="path1txtL">
@@ -220,6 +221,9 @@
         // State Variables
         // ========================================
         let hasProgressChanged = false;
+        let mobileCheckboxProxies = [];
+        let mobileStepButtons = [];
+        let mobileCheckboxIndices = [];
 
         // ========================================
         // Custom Checkbox Component
@@ -295,6 +299,8 @@
           } else {
             progressBarFill.style.backgroundColor = '#f8f8f8';
           }
+
+          syncMobileCheckboxes();
         }
 
         // ========================================
@@ -579,10 +585,146 @@
         }
 
         // ========================================
+        // Mobile Progress List
+        // ========================================
+
+        function setupMobileList() {
+          const container = document.getElementById('mobileProgress');
+          if (!container) return;
+
+          const headings = Array.from(document.querySelectorAll('h3.clickh3'));
+          const checkboxes = Array.from(document.querySelectorAll('custom-checkbox'));
+
+          if (!headings.length || !checkboxes.length) return;
+
+          const headingIndexMap = new Map(headings.map((heading, index) => [heading.id, index]));
+          const orderedHeadings = [];
+
+          const groupOrder = [
+            {
+              label: 'Getting Started',
+              ids: ['team', 'kit', 'parts']
+            },
+            {
+              label: 'Hardware',
+              ids: ['cutmdf', 'alum', 'chassis', 'chuck', 'dsmtl', 'drillcut', 'motors', 'balance', 'battery', 'rear']
+            },
+            {
+              label: 'Electronics',
+              ids: ['pcb', 'pcb2', 'testEquip', 'voltages', 'voltages2', 'lamptest', 'lamptest2', 'motortest', 'motortest2', 'pcbw1', 'pcbw2']
+            },
+            {
+              label: 'Finishing Touches',
+              ids: ['pcbs', 'radio', 'fuse', 'trim', 'drive', 'mot', 'site']
+            }
+          ];
+
+          groupOrder.forEach((group) => {
+            orderedHeadings.push({ isDivider: true, label: group.label });
+            group.ids.forEach((id) => {
+              const index = headingIndexMap.get(id);
+              if (index !== undefined) {
+                orderedHeadings.push({ heading: headings[index], index });
+                headingIndexMap.delete(id);
+              }
+            });
+          });
+
+          // Fallback: append any remaining headings in original order
+          headings.forEach((heading, index) => {
+            if (headingIndexMap.has(heading.id)) {
+              orderedHeadings.push({ heading, index });
+            }
+          });
+
+          container.innerHTML = '';
+          mobileCheckboxProxies = [];
+          mobileStepButtons = [];
+          mobileCheckboxIndices = [];
+
+          const toggleCheckboxByIndex = (index) => {
+            const checkbox = checkboxes[index];
+            if (checkbox) {
+              checkbox.toggleChecked();
+              syncMobileCheckboxes();
+            }
+          };
+
+          orderedHeadings.forEach((item) => {
+            if (item.isDivider) {
+              const divider = document.createElement('div');
+              divider.className = 'mobile-divider';
+              divider.innerHTML = `<span>${item.label}</span>`;
+              container.appendChild(divider);
+              return;
+            }
+
+            const { heading, index } = item;
+            const tooltipText = heading.querySelector('.tooltip')?.textContent?.trim() || '';
+            let titleText = heading.textContent;
+            if (tooltipText) {
+              titleText = titleText.replace(tooltipText, '').trim();
+            }
+
+            const stepButton = document.createElement('button');
+            stepButton.type = 'button';
+            stepButton.className = 'mobile-step';
+            stepButton.setAttribute('role', 'checkbox');
+            stepButton.setAttribute('aria-checked', 'false');
+            stepButton.dataset.index = index;
+
+            const proxy = document.createElement('div');
+            proxy.className = 'mobile-checkbox';
+
+            const textWrap = document.createElement('div');
+            textWrap.className = 'mobile-step-text';
+
+            const title = document.createElement('p');
+            title.className = 'mobile-step-title';
+            title.textContent = titleText;
+            textWrap.appendChild(title);
+
+            if (tooltipText) {
+              const meta = document.createElement('span');
+              meta.className = 'mobile-step-meta';
+              meta.textContent = tooltipText;
+              textWrap.appendChild(meta);
+            }
+
+            stepButton.appendChild(proxy);
+            stepButton.appendChild(textWrap);
+            container.appendChild(stepButton);
+
+            stepButton.addEventListener('click', () => toggleCheckboxByIndex(index));
+
+            mobileCheckboxProxies.push(proxy);
+            mobileStepButtons.push(stepButton);
+            mobileCheckboxIndices.push(index);
+          });
+
+          syncMobileCheckboxes();
+        }
+
+        function syncMobileCheckboxes() {
+          if (!mobileCheckboxProxies.length) return;
+          const checkboxes = document.querySelectorAll('custom-checkbox');
+          mobileCheckboxProxies.forEach((proxy, index) => {
+            const checkboxIndex = mobileCheckboxIndices[index];
+            const isChecked = checkboxes[checkboxIndex]?.isChecked() || false;
+            proxy.classList.toggle('checked', isChecked);
+            const stepButton = mobileStepButtons[index];
+            if (stepButton) {
+              stepButton.setAttribute('aria-checked', isChecked ? 'true' : 'false');
+            }
+          });
+        }
+
+        // ========================================
         // Initialisation
         // ========================================
 
         function initialise() {
+          setupMobileList();
           fetchSchoolProgress();
           setupImageDisplay();
           setupNavigation();
