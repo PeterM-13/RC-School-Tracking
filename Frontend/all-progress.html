@@ -22,81 +22,111 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const progressContainer = document.getElementsByTagName('main')[0];
+        const API_BASE_URL = 'https://rc-school-tracking.onrender.com';
+        const PROGRESS_TOTAL_STEPS = 31;
 
-            try {
-                const response = await fetch('https://rc-school-tracking.onrender.com/school-progress-all');
-                const schools = await response.json();
+        // ========================================
+        // School Progress Display
+        // ========================================
 
-                // Sort schools by progress percentage in descending order
-                schools.sort((a, b) => {
-                    const progressA = (a.progress.filter(p => p === 1).length / 31) * 100;
-                    const progressB = (b.progress.filter(p => p === 1).length / 31) * 100;
+        /*
+         * Creates a school progress card element
+         */
+        function createSchoolProgressCard(schoolName, progressPercentage) {
+          const schoolDiv = document.createElement('div');
+          schoolDiv.className = 'school-div';
 
-                    // Check if progress matches "Admin" (expected progress)
-                    if (a.school === 'Admin') return -1;
-                    if (b.school === 'Admin') return 1;
+          const schoolNameElement = document.createElement('span');
+          schoolNameElement.className = 'school-name';
+          schoolNameElement.textContent = schoolName === 'Admin' ? 'Expected Progress' : schoolName;
 
-                    // Sort by progress percentage, then alphabetically if percentages are equal
-                    if (progressB === progressA) {
-                        return a.school.localeCompare(b.school);
-                    }
+          const progressBar = document.createElement('div');
+          progressBar.className = 'progress-bar';
 
-                    return progressB - progressA;
-                });
+          const progressFill = document.createElement('div');
+          progressFill.className = 'progress-fill';
+          progressFill.style.width = `${progressPercentage}%`;
 
-                schools.forEach(({ school, progress }) => {
-                    let percentage = (progress.filter(p => p === 1).length / 31) * 100;
+          if (schoolName === 'Admin') {
+            progressFill.id = 'expected-progress';
+          }
 
-                    // Ensure percentage does not exceed 100
-                    percentage = Math.min(percentage, 100);
+          const percentageLabel = document.createElement('span');
+          percentageLabel.className = 'percentage-label';
+          percentageLabel.textContent = `${Math.round(progressPercentage)}%`;
 
-                    const schoolDiv = document.createElement('div');
-                    schoolDiv.className = 'school-div';
+          progressBar.appendChild(progressFill);
+          progressBar.appendChild(percentageLabel);
 
-                    const schoolName = document.createElement('span');
-                    schoolName.className = 'school-name';
-                    schoolName.textContent = school === 'Admin' ? 'Expected Progress' : school;
+          schoolDiv.appendChild(schoolNameElement);
+          schoolDiv.appendChild(progressBar);
 
-                    const progressBar = document.createElement('div');
-                    progressBar.className = 'progress-bar';
+          return schoolDiv;
+        }
 
-                    const progressFill = document.createElement('div');
-                    progressFill.className = 'progress-fill';
-                    progressFill.style.width = `${percentage}%`;
+        /*
+         * Calculates progress percentage for a school
+         */
+        function calculateProgressPercentage(progressArray) {
+          const completedSteps = progressArray.filter(p => p === 1).length;
+          const percentage = (completedSteps / PROGRESS_TOTAL_STEPS) * 100;
+          return Math.min(percentage, 100);
+        }
 
-                    // Assign id 'expected' if the school name is 'Admin'
-                    if (school === 'Admin') {
-                        progressFill.id = 'expected';
-                    }
+        /*
+         * Fetches and displays all school progress
+         */
+        async function loadAndDisplaySchoolProgress() {
+          const progressContainer = document.querySelector('main');
 
-                    const percentageLabel = document.createElement('span');
-                    percentageLabel.className = 'percentage-label';
-                    percentageLabel.textContent = `${Math.round(percentage)}%`;
+          try {
+            const response = await fetch(`${API_BASE_URL}/school-progress-all`);
+            const schools = await response.json();
 
-                    progressBar.appendChild(progressFill);
-                    progressBar.appendChild(percentageLabel);
+            // Sort schools: Admin first, then by progress percentage (descending), then alphabetically
+            schools.sort((schoolA, schoolB) => {
+              const progressPercentageA = calculateProgressPercentage(schoolA.progress);
+              const progressPercentageB = calculateProgressPercentage(schoolB.progress);
 
-                    schoolDiv.appendChild(schoolName);
-                    schoolDiv.appendChild(progressBar);
+              if (schoolA.school === 'Admin') return -1;
+              if (schoolB.school === 'Admin') return 1;
 
-                    progressContainer.appendChild(schoolDiv);
-                });
-            } catch (error) {
-                console.error('Error fetching school progress:', error);
-            }
-        });
+              if (progressPercentageB !== progressPercentageA) {
+                return progressPercentageB - progressPercentageA;
+              }
 
-        // Adds school info to url for navigatoin
+              return schoolA.school.localeCompare(schoolB.school);
+            });
+
+            // Create and append school progress cards
+            schools.forEach(({ school, progress }) => {
+              const percentage = calculateProgressPercentage(progress);
+              const schoolCard = createSchoolProgressCard(school, percentage);
+              progressContainer.appendChild(schoolCard);
+            });
+          } catch (error) {
+            console.error('Error fetching school progress:', error);
+          }
+        }
+
+        // ========================================
+        // Navigation
+        // ========================================
+
         document.getElementById('back').addEventListener('click', function (event) {
-            event.preventDefault();
-            const params = new URLSearchParams(window.location.search);
-            const school = params.get('school');
-            const key = params.get('key');
-            const newUrl = `./school-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
-            window.location.href = newUrl;
+          event.preventDefault();
+          const params = new URLSearchParams(window.location.search);
+          const school = params.get('school');
+          const key = params.get('key');
+          const backUrl = `./school-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+          window.location.href = backUrl;
         });
+
+        // ========================================
+        // Initialisation
+        // ========================================
+
+        document.addEventListener('DOMContentLoaded', loadAndDisplaySchoolProgress);
     </script>
     
 </body>

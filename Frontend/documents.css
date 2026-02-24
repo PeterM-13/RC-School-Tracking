@@ -1,5 +1,12 @@
+/* ========================================================================
+   DOCUMENTS PAGE STYLES
+   ======================================================================== */
 @import url('./global.css');
-header{
+
+/* ========================================================================
+   HEADER
+   ======================================================================== */
+header {
     width: 100%;
     height: 6rem;
     display: flex;
@@ -9,31 +16,30 @@ header{
     padding: 0 3rem;
     transition: height 0.5s ease-in-out;
 }
-header h1{
+
+header h1 {
     color: white;
     line-height: 2rem;
     font-size: 1.8rem;
 }
+
 #logo {
     width: 14vw;
 }
-#back{
+
+#back {
     width: 14vw;
     text-align: right;
 }
-body{
+
+/* ========================================================================
+   MAIN LAYOUT
+   ======================================================================== */
+body {
     width: 100%;
 }
-.icon{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.icon img{
-    width: 2.25rem;
-    margin-right: 1rem;
-}
-main{
+
+main {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
@@ -41,6 +47,24 @@ main{
     width: 100%;
     height: calc(100vh - 6rem);
 }
+
+/* ========================================================================
+   ICONS
+   ======================================================================== */
+.icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon img {
+    width: 2.25rem;
+    margin-right: 1rem;
+}
+
+/* ========================================================================
+   DOCUMENTS SECTION
+   ======================================================================== */
 #docs {
     display: flex;
     flex-direction: column;
@@ -53,7 +77,8 @@ main{
     border-radius: var(--border-radius);
     gap: 3.2%;
 }
-section a{
+
+section a {
     color: var(--color-primary);
     font-weight: bold;
     letter-spacing: 2px;
@@ -62,7 +87,10 @@ section a{
     font-size: 1.2rem;
 }
 
-#Messages{
+/* ========================================================================
+   MESSAGES SECTION
+   ======================================================================== */
+#Messages {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -71,7 +99,10 @@ section a{
     width: 100%;
     padding: 3rem;
 }
-#messager-container{
+
+/* Message Input Container */
+/* Message Input Container */
+#messager-container {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -79,13 +110,16 @@ section a{
     width: 100%;
     height: calc(100vh - 6rem);
 }
-#message-sender{
+
+#message-sender {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
 }
-input{
+
+/* Input Controls */
+input {
     width: 100%;
     min-height: 3rem;
     height: auto;
@@ -99,9 +133,9 @@ input{
     white-space: pre-wrap;
     resize: 1;
     max-height: 10rem; 
-
 }
-#send img{
+
+#send img {
     width: 2.5rem;
     cursor: pointer;
     rotate: -90deg;
@@ -109,23 +143,28 @@ input{
     margin-top: 0.3rem;
     transition: 0.5s;
 }
-#send img:hover{
+
+#send img:hover {
     scale: 1.1;
     transition: 0.5s;
 }
-#send img:active{
+
+#send img:active {
     scale: 0.9;
     transition: 0.5s;
 }
 
-hr{
+hr {
     width: 100%;
     color: var(--color-primary);
     border-top: 1px solid var(--color-primary);
     margin: 3rem 0;
 }
 
-#messages{
+/* ========================================================================
+   MESSAGES DISPLAY
+   ======================================================================== */
+#messages {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -136,7 +175,10 @@ hr{
     overflow-x: hidden;
     white-space: normal;
 }
-.leonardo-message, .user-message-admin{
+
+/* Leonardo Messages */
+.leonardo-message,
+.user-message-admin {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -149,18 +191,27 @@ hr{
     max-width: 80%;
     letter-spacing: 1.5px;
 }
-#leonardo-icon, #user-icon{
+
+.leonardo-message img,
+.user-message-admin img,
+#leonardo-icon,
+#user-icon {
     width: 2rem;
     margin-right: 1rem;
 }
-.user-message, .leonardo-message-admin{
+
+/* User Messages */
+.user-message,
+.leonardo-message-admin {
     display: flex;
     flex-direction: row;
     width: 100%;
     justify-content: flex-end;
     align-items: center; 
 }
-.user-message p, .leonardo-message-admin p{
+
+.user-message p,
+.leonardo-message-admin p {
     background-color: var(--color-secondary);
     color: black;
     padding: 0.8rem 1.2rem;
@@ -170,38 +221,49 @@ hr{
     letter-spacing: 1.5px;
 }
 
+/* ========================================================================
+   RESPONSIVE DESIGN
+   ======================================================================== */
 @media (max-width: 800px) {
-    header{
+    header {
         padding: 1rem;
         flex-direction: column;
         align-items: center;
         justify-content: space-around;
         min-height: 14rem;
     }
-    header h1{
+
+    header h1 {
         line-height: 1.8rem;
         font-size: 1.5rem;
     }
+
     #docs {
         grid-template-columns: repeat(1, 1fr);
         height: 35rem;        
     }
-    a{
+
+    a {
         font-size: 1rem;
     }
+
     #logo {
         display: none;
     }
-    #email{
+
+    #email {
         padding: 5rem;
     }
-    h3{
+
+    h3 {
         font-size: 0.8rem;
     }
-    a{
+
+    a {
         font-size: 1.2rem;
     }
-    #back{
+
+    #back {
         font-size: 1.2rem;
     }
 }
