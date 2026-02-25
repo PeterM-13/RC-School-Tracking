@@ -1,7 +1,12 @@
+/* ========================================================================
+   ADMIN PAGE STYLES
+   ======================================================================== */
 @import url('./global.css');
 
-
-header{
+/* ========================================================================
+   HEADER
+   ======================================================================== */
+header {
     width: 100%;
     height: 6rem;
     display: flex;
@@ -10,16 +15,18 @@ header{
     background-color: var(--color-primary);
     padding: 0 3rem;
 }
-header h1{
+
+header h1 {
     color: white;
     line-height: 2rem;
     font-size: 1.8rem;
 }
+
 #logo {
     width: 14vw;
 }
 
-a{
+a {
     color: var(--color-primary);
     margin-left: 0.5rem;
     margin-right: 0;
@@ -28,7 +35,10 @@ a{
     letter-spacing: 0.12rem;
 }
 
-.primary-buttons{
+/* ========================================================================
+   PRIMARY BUTTONS
+   ======================================================================== */
+.primary-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -41,22 +51,28 @@ a{
     padding-right: 1.2rem;
     border-radius: 6px;
 }
-#primary-buttons{
+
+#primary-buttons {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     margin-bottom: 4rem;
 }
-img{
+
+img {
     width: 2.5rem;
     margin-right: 0.5rem;
 }
-.buttonIcon{
+
+.buttonIcon {
     width: 1.8rem;
 }
 
-body{
+/* ========================================================================
+   MAIN LAYOUT
+   ======================================================================== */
+body {
     width: 100%;
 }
 
@@ -116,45 +132,55 @@ section{
     padding-left: 1rem;
 }
 
-#expected{
+#expected-progress {
     background-color: var(--color-accent);
 }
 
-.message-button{
+/* ========================================================================
+   ACTION BUTTONS
+   ======================================================================== */
+.message-button {
     margin-left: 1.25rem;
     margin-top: 0.32rem;
     background: 0;
 }
-.gotMsgs{
+
+.gotMsgs {
     cursor: pointer;
     transition: 0.5s;
 }
-.gotMsgs:hover{
+
+.gotMsgs:hover {
     scale: 1.1;
     transition: 0.5s;
 }
-.gotMsgs:active{
+
+.gotMsgs:active {
     scale: 0.9;
     transition: 0.5s;
 }
 
-.edit-button{
+.edit-button {
     margin-left: 1rem;
     margin-top: 0.25rem;
     cursor: pointer;
     background: 0;
     transition: 0.5s;
 }
-.edit-button :hover{
+
+.edit-button :hover {
     scale: 1.1;
     transition: 0.5s;
 }
-.edit-button :active{
+
+.edit-button :active {
     scale: 0.9;
     transition: 0.5s;
 }
 
-/* Tooltip Styles */
+/* ========================================================================
+   TOOLTIPS
+   ======================================================================== */
 .tooltip {
     position: fixed;
     background-color: var(--color-secondary);
@@ -167,10 +193,11 @@ section{
     pointer-events: none;
     z-index: 2000;
     white-space: nowrap;
-    
 }
 
-/* Hover Menu Styles */
+/* ========================================================================
+   HOVER MENUS
+   ======================================================================== */
 .button-with-menu {
     position: relative;
     display: inline-block;
@@ -208,6 +235,7 @@ section{
     gap: 0.75rem;
 }
 
+/* Menu Input Controls */
 .menu-input {
     padding: 0.75rem;
     border: 3px solid var(--color-primary);
@@ -241,6 +269,7 @@ section{
     border-color: var(--color-accent);
 }
 
+/* Submit Button */
 .submit-button {
     padding: 0.75rem 1.25rem;
     background-color: var(--color-primary);
@@ -262,6 +291,9 @@ section{
     transform: scale(0.95);
 }
 
+/* ========================================================================
+   ERROR DISPLAY
+   ======================================================================== */
 #error-message {
     width: 100%;
     text-align: center;
@@ -279,14 +311,19 @@ section{
     letter-spacing: 0.1rem;
 }
 
+/* ========================================================================
+   RESPONSIVE DESIGN
+   ======================================================================== */
 @media (max-width: 800px) {
     #logo {
         display: none;
     }
-    header h1{
+
+    header h1 {
         line-height: 1.6rem;
         font-size: 1.2rem;
     }
+
     .school-name {
         font-size: 1.2rem;
     }

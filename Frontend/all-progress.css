@@ -1,7 +1,12 @@
+/* ========================================================================
+   ALL PROGRESS PAGE STYLES
+   ======================================================================== */
 @import url('./global.css');
 
-
-header{
+/* ========================================================================
+   HEADER
+   ======================================================================== */
+header {
     width: 100%;
     height: 6rem;
     display: flex;
@@ -10,24 +15,30 @@ header{
     background-color: var(--color-primary);
     padding: 0 3rem;
 }
-header h1{
+
+header h1 {
     color: white;
     line-height: 2rem;
     font-size: 1.8rem;
 }
+
 #logo {
     width: 14vw;
 }
-#back{
+
+#back {
     width: 14vw;
     text-align: right;
 }
 
-body{
+/* ========================================================================
+   MAIN LAYOUT
+   ======================================================================== */
+body {
     width: 100%;
 }
 
-main{
+main {
     width: 100%;
     padding: 4rem 20% 4rem 10%;
     display: flex;
@@ -36,6 +47,9 @@ main{
     flex-direction: column;
 }
 
+/* ========================================================================
+   SCHOOL PROGRESS CARDS
+   ======================================================================== */
 .school-div {
     display: flex;
     align-items: center;
@@ -50,9 +64,11 @@ main{
     padding-right: 1rem;
     font-size: 1.5rem;
     letter-spacing: 2px;
-
 }
 
+/* ========================================================================
+   PROGRESS VISUALISATION
+   ======================================================================== */
 .progress-bar {
     flex-grow: 1;
     height: 2.5rem;
@@ -79,18 +95,23 @@ main{
     padding-left: 1rem;
 }
 
-#expected{
+#expected-progress {
     background-color: var(--color-accent);
 }
 
+/* ========================================================================
+   RESPONSIVE DESIGN
+   ======================================================================== */
 @media (max-width: 800px) {
     #logo {
         display: none;
     }
-    header h1{
+
+    header h1 {
         line-height: 1.6rem;
         font-size: 1.2rem;
     }
+
     .school-name {
         font-size: 1.2rem;
     }
