@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="3dView.css">
+    <link rel="stylesheet" href="3dView.css?v=2026-02-25-3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
@@ -21,6 +21,10 @@
 
     <div id="status">Loading model...</div>
     <canvas id="viewer"></canvas>
+    <div id="annotationLayer" aria-hidden="true">
+        <svg id="annotationSvg"></svg>
+        <div id="annotationLabels"></div>
+    </div>
 
     <script type="importmap">
         {
@@ -39,6 +43,63 @@
         const canvas = document.getElementById("viewer");
         const statusEl = document.getElementById("status");
         const headerEl = document.querySelector("header");
+        const backLink = document.getElementById("back");
+        const annotationLayer = document.getElementById("annotationLayer");
+        const annotationSvg = document.getElementById("annotationSvg");
+        const annotationLabels = document.getElementById("annotationLabels");
+        const projectedPoint = new THREE.Vector3();
+        const tmpWorldPoint = new THREE.Vector3();
+        const raycaster = new THREE.Raycaster();
+        let occluderMeshes = [];
+
+        // Add more annotations in this array.
+        const annotationConfigs = [
+            {
+                id: "motor",
+                label: "Drill Motor",
+                targetNameIncludes: "motor",
+                fallbackFromBounds: { x: 0.06, y: -0.082, z: -0.29 },
+                labelOffset: { x: 72, y: -48 },
+                occlusionPadding: 0.06,
+                enableOcclusion: true,
+                enableOcclusionForFallback: true
+            },
+            {
+                id: "pcb",
+                label: "PCB",
+                targetNameIncludes: "pcb",
+                fallbackFromBounds: { x: 0.0, y: -0.15, z: 0.3 },
+                labelOffset: { x: 72, y: -48 },
+                occlusionPadding: 0.06,
+                enableOcclusion: true,
+                enableOcclusionForFallback: true
+            },
+            {
+                id: "battery",
+                label: "Drill Batteries",
+                targetNameIncludes: "battery",
+                fallbackFromBounds: { x: 0.06, y: 0, z: -0.05 },
+                labelOffset: { x: 72, y: -48 },
+                occlusionPadding: 0.06,
+                enableOcclusionForFallback: true
+            },
+            {
+                id: "receiver",
+                label: "Receiver",
+                targetNameIncludes: "receiver",
+                fallbackFromBounds: { x: 0.42, y: 0.1, z: -0.05 },
+                labelOffset: { x: 72, y: -48 },
+                occlusionPadding: 0.06,
+                enableOcclusionForFallback: true
+            }
+        ];
+        const annotations = [];
+
+        backLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            const query = window.location.search;
+            window.location.href = `./school-progress.html${query}`;
+        });
 
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -86,9 +147,14 @@
             const maxDim = Math.max(size.x, size.y, size.z);
             const fov = THREE.MathUtils.degToRad(camera.fov);
             const fitDistance = maxDim / (2 * Math.tan(fov / 2));
-            const distance = fitDistance * 1.4;
+            const distance = fitDistance * 1;
+            const defaultAzimuth = -Math.PI / 0.8; // 90 deg opposite from previous +45 deg view
 
-            camera.position.set(center.x + distance, center.y + distance * 0.5, center.z + distance);
+            camera.position.set(
+                center.x + Math.cos(defaultAzimuth) * distance,
+                center.y + distance,
+                center.z + Math.sin(defaultAzimuth) * distance
+            );
             camera.near = Math.max(distance / 100, 0.01);
             camera.far = distance * 100;
             camera.updateProjectionMatrix();
@@ -99,13 +165,179 @@
             controls.update();
         }
 
+        function hideAnnotation(annotation) {
+            annotation.labelEl.style.display = "none";
+            annotation.lineEl.style.display = "none";
+        }
+
+        function getNodeDepth(node) {
+            let depth = 0;
+            let current = node;
+            while (current?.parent) {
+                depth += 1;
+                current = current.parent;
+            }
+            return depth;
+        }
+
+        function collectMeshDescendants(node) {
+            const meshes = [];
+            node.traverse((child) => {
+                if (child.isMesh) meshes.push(child);
+            });
+            return meshes;
+        }
+
+        function resolveTargetNode(root, namePart) {
+            const matches = [];
+            root.traverse((node) => {
+                if (!node.name) return;
+                if (node.name.toLowerCase().includes(namePart.toLowerCase())) {
+                    matches.push(node);
+                }
+            });
+            if (!matches.length) return null;
+
+            const meshMatch = matches.find((node) => node.isMesh);
+            if (meshMatch) return meshMatch;
+
+            // Prefer the deepest (most specific) named node when no mesh is directly named.
+            matches.sort((a, b) => getNodeDepth(b) - getNodeDepth(a));
+            return matches[0];
+        }
+
+        function buildAnnotations(root) {
+            annotationSvg.innerHTML = "";
+            annotationLabels.innerHTML = "";
+            annotations.length = 0;
+
+            const box = new THREE.Box3().setFromObject(root);
+            const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3());
+
+            annotationConfigs.forEach((config) => {
+                const labelEl = document.createElement("div");
+                labelEl.className = "annotationLabel";
+                labelEl.textContent = config.label;
+                annotationLabels.appendChild(labelEl);
+
+                const lineEl = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineEl.classList.add("annotationLine");
+                annotationSvg.appendChild(lineEl);
+
+                let targetNode = null;
+                if (config.targetNameIncludes) {
+                    targetNode = resolveTargetNode(root, config.targetNameIncludes);
+                }
+
+                let fallbackWorld = null;
+                if (!targetNode && config.fallbackFromBounds) {
+                    fallbackWorld = new THREE.Vector3(
+                        center.x + (size.x * config.fallbackFromBounds.x),
+                        center.y + (size.y * config.fallbackFromBounds.y),
+                        center.z + (size.z * config.fallbackFromBounds.z)
+                    );
+                }
+
+                annotations.push({
+                    config,
+                    targetNode,
+                    targetMeshes: targetNode ? collectMeshDescendants(targetNode) : [],
+                    occlusionEnabled: config.enableOcclusion !== false
+                        && (targetNode || config.enableOcclusionForFallback !== false),
+                    fallbackWorld,
+                    labelEl,
+                    lineEl
+                });
+            });
+        }
+
+        function getWorldAnchor(annotation) {
+            if (annotation.targetNode) {
+                return annotation.targetNode.getWorldPosition(tmpWorldPoint);
+            }
+            if (annotation.fallbackWorld) {
+                return tmpWorldPoint.copy(annotation.fallbackWorld);
+            }
+            return null;
+        }
+
+        function isOccluded(annotation, anchorWorld, padding = 0.05) {
+            const direction = tmpWorldPoint.copy(anchorWorld).sub(camera.position);
+            const targetDistance = direction.length();
+            if (targetDistance <= 0.0001 || !occluderMeshes.length) return false;
+
+            direction.normalize();
+            raycaster.set(camera.position, direction);
+            const hits = raycaster.intersectObjects(occluderMeshes, true);
+            if (!hits.length) return false;
+
+            for (const hit of hits) {
+                if (hit.distance >= (targetDistance - padding)) {
+                    return false;
+                }
+                if (annotation.targetMeshes.includes(hit.object)) {
+                    continue;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function updateAnnotations() {
+            if (!annotations.length) return;
+
+            const rect = annotationLayer.getBoundingClientRect();
+            annotations.forEach((annotation) => {
+                const anchorWorld = getWorldAnchor(annotation);
+                if (!anchorWorld) {
+                    hideAnnotation(annotation);
+                    return;
+                }
+
+                projectedPoint.copy(anchorWorld).project(camera);
+                const inFrustum = projectedPoint.z > -1
+                    && projectedPoint.z < 1
+                    && projectedPoint.x > -1
+                    && projectedPoint.x < 1
+                    && projectedPoint.y > -1
+                    && projectedPoint.y < 1;
+
+                if (!inFrustum || (annotation.occlusionEnabled
+                    && isOccluded(annotation, anchorWorld, annotation.config.occlusionPadding))) {
+                    hideAnnotation(annotation);
+                    return;
+                }
+
+                const pointX = (projectedPoint.x * 0.5 + 0.5) * rect.width;
+                const pointY = (-projectedPoint.y * 0.5 + 0.5) * rect.height;
+                const offsetX = annotation.config.labelOffset?.x ?? 64;
+                const offsetY = annotation.config.labelOffset?.y ?? -44;
+                const labelX = Math.min(Math.max(pointX + offsetX, 12), rect.width - 100);
+                const labelY = Math.min(Math.max(pointY + offsetY, 12), rect.height - 34);
+
+                annotation.labelEl.style.display = "block";
+                annotation.lineEl.style.display = "block";
+                annotation.labelEl.style.transform = `translate(${labelX}px, ${labelY}px)`;
+                annotation.lineEl.setAttribute("x1", `${pointX}`);
+                annotation.lineEl.setAttribute("y1", `${pointY}`);
+                annotation.lineEl.setAttribute("x2", `${labelX - 8}`);
+                annotation.lineEl.setAttribute("y2", `${labelY + 14}`);
+            });
+        }
+
         const loader = new GLTFLoader();
         loader.load(
-            "./Docs/Chariot_Model.glb",
+            "./Docs/Chariot_Model.gltf",
             (gltf) => {
                 const model = gltf.scene;
                 scene.add(model);
+                occluderMeshes = [];
+                model.traverse((node) => {
+                    if (node.isMesh) occluderMeshes.push(node);
+                });
                 frameModel(model);
+                buildAnnotations(model);
                 statusEl.style.display = "none";
             },
             undefined,
@@ -121,6 +353,7 @@
 
         function animate() {
             controls.update();
+            updateAnnotations();
             renderer.render(scene, camera);
             requestAnimationFrame(animate);
         }

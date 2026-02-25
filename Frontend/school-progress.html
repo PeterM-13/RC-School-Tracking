@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="school-progress.css">
+    <link rel="stylesheet" href="school-progress.css?v=2026-02-25-1">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,6 +26,9 @@
             <a id="allProgLink" href="./all-progress.html">All Schools</a>
             <a id="docsLink" href="./documents.html">Documents & Help</a>
         </div>
+        <a id="view3dLink" href="./3dView.html" aria-label="Open 3D View">
+            <img src="./icons/3DIcon.png" alt="3D View">
+        </a>
     </header>
 
     <main>
@@ -565,6 +568,12 @@
               url += `&adminKey=${encodeURIComponent(adminKey)}`;
             }
             window.location.href = url;
+          });
+
+          document.getElementById('view3dLink').addEventListener('click', function (event) {
+            event.preventDefault();
+            const query = window.location.search;
+            window.location.href = `./3dView.html${query}`;
           });
         }
 
