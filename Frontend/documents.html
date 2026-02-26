@@ -55,6 +55,12 @@
     const API_BASE_URL = 'https://rc-school-tracking.onrender.com';
     const COMMENT_POLL_INTERVAL = 5000;
 
+    function formatSchoolName(schoolName) {
+      return schoolName
+        .toLowerCase()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
     // ========================================
     // Message Display Functions
     // ========================================
@@ -268,7 +274,17 @@
       const school = params.get('school');
       const adminKey = params.get('adminKey');
       const messagesSection = document.getElementById('Messages');
+      const messageTitle = messagesSection.querySelector('h1');
+      const messageSubtitle = messagesSection.querySelector('p');
       const docsSection = document.getElementById('docs');
+
+      if (adminKey && school && school !== 'Admin') {
+        messageTitle.textContent = `Contact ${formatSchoolName(school)}`;
+        messageSubtitle.textContent = 'Answer any questions from the school here.';
+      } else {
+        messageTitle.textContent = 'Contact Leonardo';
+        messageSubtitle.textContent = 'Send us a message, We will respond as soon as we can.';
+      }
 
       if (school === 'Admin' && adminKey) {
         // Admin view
