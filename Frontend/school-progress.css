@@ -123,17 +123,22 @@ p {
     position: absolute;
     top: calc(100vh - 3.8rem);
     right: 0.9rem;
-    width: 3.2rem;
+    width: 10rem;
     height: 3.2rem;
     margin: 0;
-    padding: 0;
+    padding: 8px;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     border-radius: 0.6rem;
     background: #E93838;
     text-decoration: none;
     border: none;
+}
+#view3dLink h2{
+    font-size: 18px;
+    color:white;
 }
 
 #view3dLink:hover {
