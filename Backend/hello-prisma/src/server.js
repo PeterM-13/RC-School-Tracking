@@ -411,12 +411,21 @@ app.post('/comment', async (req, res) => {
 
 // DELETE a comment by index
 app.delete('/comment', async (req, res) => {
-  const { 'school-name': schoolName, 'school-key': password, 'comment-index': commentIndex } = req.body;
+  const { 'school-name': schoolName, 'school-key': password, 'comment-index': commentIndex, 'admin-key': adminKey } = req.body;
   try {
     if (!schoolName || !password || commentIndex === undefined) {
       return res.status(400).json({ 
         error: 'School name, password, and comment index are required' 
       });
+    }
+
+    if (!adminKey) {
+      return res.status(400).json({ error: 'Admin key is required to delete comments' });
+    }
+
+    const admin = await findSchoolByNameAndPassword('Admin', adminKey);
+    if (!admin) {
+      return res.status(403).json({ error: 'Incorrect admin key' });
     }
 
     const school = await findSchoolByNameAndPasswordSelect(

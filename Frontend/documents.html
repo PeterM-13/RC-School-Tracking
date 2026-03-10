@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="documents.css?v=2026-02-27-1">
+    <link rel="stylesheet" href="documents.css?v=2026-03-10-1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
@@ -65,7 +65,7 @@
     // Message Display Functions
     // ========================================
 
-    function addLeonardoMessage(text) {
+    function addLeonardoMessage(text, commentIndex) {
       const params = new URLSearchParams(window.location.search);
       const isAdminView = params.has('adminKey');
       const messagesContainer = document.getElementById('messages');
@@ -74,6 +74,9 @@
 
       messageText.textContent = text;
       messageElement.className = isAdminView ? 'leonardo-message-admin' : 'leonardo-message';
+      if (isAdminView) {
+        messageElement.classList.add('message-with-delete');
+      }
 
       if (!isAdminView) {
         const icon = document.createElement('img');
@@ -83,10 +86,13 @@
       }
 
       messageElement.appendChild(messageText);
+      if (isAdminView && Number.isInteger(commentIndex)) {
+        messageElement.appendChild(createDeleteButton(commentIndex));
+      }
       messagesContainer.appendChild(messageElement);
     }
 
-    function addUserMessage(text) {
+    function addUserMessage(text, commentIndex) {
       const params = new URLSearchParams(window.location.search);
       const isAdminView = params.has('adminKey');
       const messagesContainer = document.getElementById('messages');
@@ -95,6 +101,9 @@
 
       messageText.textContent = text;
       messageElement.className = isAdminView ? 'user-message-admin' : 'user-message';
+      if (isAdminView) {
+        messageElement.classList.add('message-with-delete');
+      }
 
       if (isAdminView) {
         const icon = document.createElement('img');
@@ -104,6 +113,9 @@
       }
 
       messageElement.appendChild(messageText);
+      if (isAdminView && Number.isInteger(commentIndex)) {
+        messageElement.appendChild(createDeleteButton(commentIndex));
+      }
       messagesContainer.appendChild(messageElement);
     }
 
@@ -177,11 +189,12 @@
       if (comments.length === 0) {
         addLeonardoMessage('Hi there! How can we help?');
       } else {
-        comments.forEach(comment => {
+        comments.forEach((comment, idx) => {
+          const commentIndex = Number.isInteger(comment.index) ? comment.index : idx;
           if (comment.sender === 'leonardo') {
-            addLeonardoMessage(comment.text);
+            addLeonardoMessage(comment.text, commentIndex);
           } else {
-            addUserMessage(comment.text);
+            addUserMessage(comment.text, commentIndex);
           }
         });
       }
@@ -244,6 +257,64 @@
         alert('Failed to send message.');
         return false;
       }
+    }
+
+    /*
+     * Deletes a comment (admin only)
+     */
+    async function deleteComment(commentIndex) {
+      const params = new URLSearchParams(window.location.search);
+      const school = params.get('school');
+      const key = params.get('key');
+      const adminKey = params.get('adminKey');
+
+      if (!school || !key || !adminKey) {
+        alert('Missing school or authentication key');
+        return false;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/comment`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            'school-name': school,
+            'school-key': key,
+            'comment-index': commentIndex,
+            'admin-key': adminKey
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to delete message');
+
+        return true;
+      } catch (err) {
+        console.error('Error deleting comment:', err);
+        alert('Failed to delete message.');
+        return false;
+      }
+    }
+
+    function createDeleteButton(commentIndex) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'delete-message';
+      button.setAttribute('aria-label', 'Delete message');
+      const icon = document.createElement('img');
+      icon.src = 'icons/rubbish.png';
+      icon.alt = 'Delete';
+      icon.className = 'delete-icon';
+      button.appendChild(icon);
+
+      button.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        const success = await deleteComment(commentIndex);
+        if (success) {
+          fetchAndDisplayComments();
+        }
+      });
+
+      return button;
     }
 
     // ========================================
