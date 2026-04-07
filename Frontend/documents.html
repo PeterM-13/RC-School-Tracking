@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="documents.css?v=2026-03-10-1">
+    <link rel="stylesheet" href="documents.css?v=2026-04-07-1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
@@ -54,6 +54,7 @@
 <script>
     const API_BASE_URL = 'https://rc-school-tracking.onrender.com';
     const COMMENT_POLL_INTERVAL = 5000;
+    const DEFAULT_LEONARDO_MESSAGE = 'Hi there! How can we help?';
 
     function formatSchoolName(schoolName) {
       return schoolName
@@ -94,7 +95,7 @@
 
     function addUserMessage(text, commentIndex) {
       const params = new URLSearchParams(window.location.search);
-      const isAdminView = params.has('adminKey');
+      const isAdminView = params.has('adminKey');// || params.get('school') == 'Admin';
       const messagesContainer = document.getElementById('messages');
       const messageElement = document.createElement('span');
       const messageText = document.createElement('p');
@@ -117,6 +118,19 @@
         messageElement.appendChild(createDeleteButton(commentIndex));
       }
       messagesContainer.appendChild(messageElement);
+    }
+
+    function renderDefaultLeonardoMessage({ preserveExisting = false } = {}) {
+      const messagesContainer = document.getElementById('messages');
+
+      if (!preserveExisting) {
+        messagesContainer.innerHTML = '';
+      }
+
+      if (messagesContainer.childElementCount === 0) {
+        addLeonardoMessage(DEFAULT_LEONARDO_MESSAGE);
+        scrollToBottom();
+      }
     }
 
     // ========================================
@@ -160,7 +174,7 @@
         displayComments(comments);
       } catch (err) {
         console.error('Error fetching comments:', err);
-        addLeonardoMessage('Hi there! How can we help?');
+        renderDefaultLeonardoMessage({ preserveExisting: true });
       }
     }
 
@@ -187,7 +201,7 @@
       messagesContainer.innerHTML = '';
 
       if (comments.length === 0) {
-        addLeonardoMessage('Hi there! How can we help?');
+        renderDefaultLeonardoMessage();
       } else {
         comments.forEach((comment, idx) => {
           const commentIndex = Number.isInteger(comment.index) ? comment.index : idx;
