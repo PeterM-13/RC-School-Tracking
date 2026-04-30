@@ -78,6 +78,24 @@ h2 {
   border-color: var(--color-primary);
 }
 
+.pswd-row {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+.toggle-pswd {
+  position: absolute;
+  right: 12px;
+  top: 30%;
+  transform: translateY(-50%);
+  color: rgb(220,56,56);
+  cursor: pointer;
+  display: none;
+  user-select: none;
+  background: transparent;
+}
+
 /* ================================
    Button Styling
    ================================ */

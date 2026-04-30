@@ -23,7 +23,10 @@
         </select>
 
         <h2>Enter password</h2>
-        <input id="pswd" placeholder="Enter password">
+        <div class="pswd-row">
+          <input id="pswd" type="text" placeholder="Enter password">
+          <span id="toggle-pswd" class="toggle-pswd">Show</span>
+        </div>
 
         <button id="login-button">Start Building</button>
         <p id="loading">Loading, please wait...</p>
@@ -142,27 +145,53 @@
         // ========================================
 
         document.addEventListener('DOMContentLoaded', () => {
-            startLoadingAnimation();
-            populateSchoolDropdown();
+          startLoadingAnimation();
+          populateSchoolDropdown();
 
-            loginButton = document.getElementById('login-button');
-            loginButton.addEventListener('click', handleLogin);
+          const loginButton = document.getElementById('login-button');
+          loginButton.addEventListener('click', handleLogin);
 
-            passwordInput = document.getElementById('pswd');
-            passwordInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    loginButton.click();
-                }
-            });
+          const passwordInput = document.getElementById('pswd');
+          const togglePswd = document.getElementById('toggle-pswd');
 
-            dropdown = document.getElementById('school-dropdown');
-            dropdown.addEventListener('change', () => {
-                const selectedSchool = dropdown.value;
-                if (selectedSchool && !passwordInput.value.trim() && selectedSchool !== 'Admin') {
-                    passwordInput.value = selectedSchool.replace(/\s+/g, '').toLowerCase();
-                }
-            });
+          // Toggle show/hide when clicking the text
+          togglePswd.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+              passwordInput.type = 'text';
+              togglePswd.textContent = 'Hide';
+            } else {
+              passwordInput.type = 'password';
+              togglePswd.textContent = 'Show';
+            }
+          });
+
+          passwordInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              loginButton.click();
+            }
+          });
+
+          const dropdown = document.getElementById('school-dropdown');
+          dropdown.addEventListener('change', () => {
+            const selectedSchool = dropdown.value;
+
+            if (selectedSchool === 'Admin') {
+              // Admin: obscure by default and show the toggle control
+              passwordInput.type = 'password';
+              passwordInput.value = '';
+              togglePswd.style.display = 'inline';
+              togglePswd.textContent = 'Show';
+            } else {
+              // Non-admin: plain text, hide toggle
+              passwordInput.type = 'text';
+              togglePswd.style.display = 'none';
+
+              if (selectedSchool && !passwordInput.value.trim()) {
+                passwordInput.value = selectedSchool.replace(/\s+/g, '').toLowerCase();
+              }
+            }
+          });
         });
     </script>
 </body>
