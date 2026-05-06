@@ -74,6 +74,11 @@ h2 {
   outline: none;
 }
 
+#pswd::-ms-reveal,
+#pswd::-ms-clear {
+  display: none;
+}
+
 #pswd:focus {
   border-color: var(--color-primary);
 }
@@ -115,6 +120,19 @@ h2 {
 
 #login-button:hover {
   background-color: rgb(192, 24, 24);
+}
+
+.login-message {
+  display: none;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: var(--border-radius);
+  background-color: rgba(233, 56, 56, 0.12);
+  border: 1px solid rgba(233, 56, 56, 0.35);
+  color: rgb(162, 28, 28);
+  font-size: 1rem;
+  letter-spacing: 1px;
 }
 
 /* ================================

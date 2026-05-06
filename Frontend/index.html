@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="login.css?v=2026-02-25-1">
+    <link rel="stylesheet" href="login.css?v=2026-05-01-1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
@@ -29,6 +29,7 @@
         </div>
 
         <button id="login-button">Start Building</button>
+        <p id="login-message" class="login-message" aria-live="polite"></p>
         <p id="loading">Loading, please wait...</p>
     </main>
 
@@ -65,10 +66,22 @@
           const password = document.getElementById('pswd').value;
 
           if (!selectedSchool || !password) {
-            alert('Please select a school and enter a password.');
+            showLoginMessage('Please select a school and enter a password.');
             return false;
           }
           return true;
+        }
+
+        function showLoginMessage(message) {
+          const messageElement = document.getElementById('login-message');
+          messageElement.textContent = message;
+          messageElement.style.display = 'block';
+        }
+
+        function clearLoginMessage() {
+          const messageElement = document.getElementById('login-message');
+          messageElement.textContent = '';
+          messageElement.style.display = 'none';
         }
 
         /*
@@ -113,6 +126,8 @@
           const password = document.getElementById('pswd').value;
           const loadingElement = document.getElementById('loading');
 
+          clearLoginMessage();
+
           if (!validateLoginInputs()) {
             return;
           }
@@ -131,7 +146,7 @@
               window.location.href = `${targetPage}?school=${encodeURIComponent(selectedSchool)}&key=${encodeURIComponent(password)}`;
             } else {
               loadingElement.style.display = 'none';
-              alert('Incorrect password for selected school. Please try again.');
+              showLoginMessage('Incorrect password for selected school. Please try again.');
             }
           } catch (error) {
             console.error('Error during login:', error);
@@ -153,6 +168,7 @@
 
           const passwordInput = document.getElementById('pswd');
           const togglePswd = document.getElementById('toggle-pswd');
+          const loginMessage = document.getElementById('login-message');
 
           // Toggle show/hide when clicking the text
           togglePswd.addEventListener('click', () => {
@@ -172,9 +188,17 @@
             }
           });
 
+          passwordInput.addEventListener('input', () => {
+            if (loginMessage.textContent) {
+              clearLoginMessage();
+            }
+          });
+
           const dropdown = document.getElementById('school-dropdown');
           dropdown.addEventListener('change', () => {
             const selectedSchool = dropdown.value;
+
+            clearLoginMessage();
 
             if (selectedSchool === 'Admin') {
               // Admin: obscure by default and show the toggle control
