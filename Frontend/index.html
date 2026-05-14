@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <title>School Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-api.js"></script>
 </head>
 <body>
     <header>
@@ -34,7 +37,6 @@
     </main>
 
     <script>
-        const API_BASE_URL = 'https://rc-school-tracking.onrender.com';
         const LOADING_ERROR_MESSAGE = 'LOADING ERROR. Please try again later.';
 
         // ========================================
@@ -93,8 +95,7 @@
 
           try {
             loadingElement.style.display = 'block';
-            const response = await fetch(`${API_BASE_URL}/school-names`);
-            const schools = await response.json();
+            const schools = await RcApi.getSchoolNames();
 
             // Sort schools: Admin at the end, others alphabetically
             schools.sort((schoolA, schoolB) => {
@@ -133,13 +134,7 @@
           }
 
           try {
-            const response = await fetch(`${API_BASE_URL}/school-password`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name: selectedSchool, password })
-            });
-
-            const result = await response.json();
+            const result = await RcApi.verifySchoolPassword(selectedSchool, password);
 
             if (result.success) {
               const targetPage = selectedSchool === 'Admin' ? 'admin.html' : 'school-progress.html';

@@ -9,6 +9,9 @@
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
     <title>Schools Progress</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-api.js"></script>
 </head>
 <body>
     <header>
@@ -67,7 +70,6 @@
     </main>
 
     <script>
-        const API_BASE_URL = 'https://rc-school-tracking.onrender.com';
         const PROGRESS_TOTAL_STEPS = 31;
         const MESSAGE_CHECK_INTERVAL = 10000;
         const TOOLTIP_DELAY = 600;
@@ -156,8 +158,10 @@
           const progressContainer = document.querySelector('section');
 
           try {
-            const response = await fetch(`${API_BASE_URL}/school-progress-all`);
-            const schools = await response.json();
+            const urlParams = new URLSearchParams(window.location.search);
+            const schools = await RcApi.listSchoolProgress({
+              adminKey: urlParams.get('key')
+            });
 
             // Sort schools: Admin first, then by progress percentage (descending), then alphabetically
             schools.sort((schoolA, schoolB) => {
@@ -204,53 +208,31 @@
         /*
          * Attempts to add a new school
          */
-        async function addNewSchool(schoolName, password) {
+        async function addNewSchool(schoolName, password, adminKey) {
           try {
-            const response = await fetch(`${API_BASE_URL}/school`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name: schoolName, password })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-              alert(`School "${schoolName}" added successfully!`);
-              document.getElementById('school-name-input').value = '';
-              document.getElementById('school-password-input').value = '';
-              location.reload();
-            } else {
-              alert(result.error || 'Failed to add school');
-            }
+            await RcApi.createSchool(adminKey, schoolName, password);
+            alert(`School "${schoolName}" added successfully!`);
+            document.getElementById('school-name-input').value = '';
+            document.getElementById('school-password-input').value = '';
+            location.reload();
           } catch (error) {
             console.error('Error adding school:', error);
-            alert('An error occurred while adding the school.');
+            alert(error.message || 'An error occurred while adding the school.');
           }
         }
 
         /*
          * Attempts to remove a school
          */
-        async function removeSchool(schoolName, password) {
+        async function removeSchool(schoolName, password, adminKey) {
           try {
-            const response = await fetch(`${API_BASE_URL}/school`, {
-              method: 'DELETE',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name: schoolName, password })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-              alert(result.message || `School "${schoolName}" removed successfully!`);
-              document.getElementById('remove-school-password-input').value = '';
-              location.reload();
-            } else {
-              alert(result.error || 'Failed to remove school');
-            }
+            const result = await RcApi.deleteSchool(adminKey, schoolName, password);
+            alert(result.message || `School "${schoolName}" removed successfully!`);
+            document.getElementById('remove-school-password-input').value = '';
+            location.reload();
           } catch (error) {
             console.error('Error removing school:', error);
-            alert('An error occurred while removing the school.');
+            alert(error.message || 'An error occurred while removing the school.');
           }
         }
 
@@ -259,23 +241,12 @@
          */
         async function resetAllProgress(adminPassword) {
           try {
-            const response = await fetch(`${API_BASE_URL}/reset-all-progress`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ password: adminPassword })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-              document.getElementById('reset-admin-password-input').value = '';
-              location.reload();
-            } else {
-              alert(result.error || 'Failed to reset progress');
-            }
+            await RcApi.resetAllProgress(adminPassword);
+            document.getElementById('reset-admin-password-input').value = '';
+            location.reload();
           } catch (error) {
             console.error('Error resetting progress:', error);
-            alert('An error occurred while resetting progress.');
+            alert(error.message || 'An error occurred while resetting progress.');
           }
         }
 
@@ -284,7 +255,7 @@
          */
         async function editSchoolProgress(schoolName, adminKey) {
           if (schoolName === 'Admin') {
-            window.location.href = `school-progress.html?school=${encodeURIComponent(schoolName)}&key=${encodeURIComponent(adminKey)}&adminKey=${encodeURIComponent(adminKey)}`;
+            window.location.href = `admin-progress.html?school=${encodeURIComponent(schoolName)}&key=${encodeURIComponent(adminKey)}&adminKey=${encodeURIComponent(adminKey)}`;
             return;
           }
 
@@ -294,15 +265,9 @@
           if (!password) return;
 
           try {
-            const response = await fetch(`${API_BASE_URL}/school-password`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name: schoolName, password })
-            });
+            const result = await RcApi.verifySchoolPassword(schoolName, password);
 
-            const result = await response.json();
-
-            if (response.ok && result.success) {
+            if (result.success) {
               window.location.href = `school-progress.html?school=${encodeURIComponent(schoolName)}&key=${encodeURIComponent(password)}&adminKey=${encodeURIComponent(adminKey)}`;
             } else {
               alert('Incorrect password.');
@@ -421,10 +386,7 @@
          */
         async function checkUnviewedComments(adminKey) {
           try {
-            const response = await fetch(`${API_BASE_URL}/unviewed-comments?adminKey=${encodeURIComponent(adminKey)}&sent-by=school`);
-            if (!response.ok) return;
-
-            const unviewedBySchool = await response.json();
+            const unviewedBySchool = await RcApi.getUnviewedComments(adminKey, 'school');
 
             // Update icons for schools with unviewed comments
             Object.keys(unviewedBySchool).forEach(schoolName => {
@@ -476,7 +438,7 @@
             const password = document.getElementById('remove-school-password-input').value.trim();
 
             if (!schoolName || !password) return;
-            removeSchool(schoolName, password);
+            removeSchool(schoolName, password, adminKey);
           });
 
           // Setup add school functionality
@@ -489,7 +451,7 @@
               alert('Please enter both school name and password.');
               return;
             }
-            addNewSchool(schoolName, password);
+            addNewSchool(schoolName, password, adminKey);
           });
 
           // Setup reset progress functionality

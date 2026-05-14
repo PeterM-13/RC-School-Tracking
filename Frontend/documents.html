@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
     <title>Documents</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-api.js"></script>
 </head>
 <body>
     <header>
@@ -52,7 +55,6 @@
 </body>
 
 <script>
-    const API_BASE_URL = 'https://rc-school-tracking.onrender.com';
     const COMMENT_POLL_INTERVAL = 5000;
     const DEFAULT_LEONARDO_MESSAGE = 'Hi there! How can we help?';
 
@@ -149,13 +151,8 @@
       if (!key) return;
 
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/comments?school-name=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`
-        );
-
-        if (!response.ok) throw new Error('Failed to fetch comments');
-
-        const data = await response.json();
+        const data = await RcApi.getComments(school, key);
+        if (data.error) throw new Error(data.error);
         const comments = Array.isArray(data.comments) ? data.comments : [];
 
         // Mark appropriate sender's unviewed comments as viewed
@@ -182,15 +179,7 @@
      * Marks a specific comment as viewed
      */
     async function markCommentAsViewed(school, key, commentIndex) {
-      await fetch(`${API_BASE_URL}/comment-viewed`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          'school-name': school,
-          key,
-          'msg-index': commentIndex
-        })
-      });
+      await RcApi.markCommentViewed(school, key, commentIndex);
     }
 
     /*
@@ -249,13 +238,12 @@
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/comment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) throw new Error('Failed to send message');
+        await RcApi.addComment(
+          requestBody['school-name'],
+          requestBody['school-key'],
+          requestBody.text,
+          requestBody['admin-key'] || null
+        );
 
         // Display message immediately in UI
         if (adminKey) {
@@ -288,18 +276,7 @@
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/comment`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            'school-name': school,
-            'school-key': key,
-            'comment-index': commentIndex,
-            'admin-key': adminKey
-          })
-        });
-
-        if (!response.ok) throw new Error('Failed to delete message');
+        await RcApi.deleteComment(school, key, commentIndex, adminKey);
 
         return true;
       } catch (err) {
