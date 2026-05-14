@@ -79,6 +79,31 @@ main {
     overflow-y: auto;
 }
 
+.admin-documents-view main {
+    justify-content: center;
+}
+
+.admin-documents-view #docs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(18rem, 1fr));
+    align-content: start;
+    justify-content: center;
+    width: min(100%, 58rem);
+    min-width: 0;
+    height: auto;
+    max-height: 100%;
+    margin: 0 auto;
+}
+
+.admin-documents-view #docs .icon {
+    justify-content: flex-start;
+}
+
+.admin-documents-view #docs{
+    margin: 5rem auto;
+    gap: 1.8rem;
+}
+
 section a {
     color: var(--color-primary);
     font-weight: bold;
@@ -311,6 +336,12 @@ hr {
     #docs {
         grid-template-columns: repeat(1, 1fr);
         height: 35rem;        
+    }
+
+    .admin-documents-view #docs {
+        grid-template-columns: 1fr;
+        width: 100%;
+        height: auto;
     }
 
     a {

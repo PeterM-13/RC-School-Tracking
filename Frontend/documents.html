@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="documents.css?v=2026-04-07-1">
+    <link rel="stylesheet" href="documents.css?v=2026-05-14-1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
@@ -351,7 +351,7 @@
       if (school === 'Admin' && adminKey) {
         // Admin view
         messagesSection.style.display = 'none';
-        docsSection.style.width = '100%';
+        document.body.classList.add('admin-documents-view');
       }
 
       fetchAndDisplayComments();

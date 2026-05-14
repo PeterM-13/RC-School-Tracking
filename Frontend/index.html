@@ -95,6 +95,7 @@
           const loadingDelay = setTimeout(() => {
             loadingElement.style.display = 'block';
           }, 500);
+          //loadingElement.style.display = 'block';
 
           try {
             const schools = await RcApi.getSchoolNames();
