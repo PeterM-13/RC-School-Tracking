@@ -12,3 +12,17 @@ controlled functions in `schema.sql`.
 No Edge Functions are required for the current app because the existing backend
 logic is simple credential checks plus row updates, which fits cleanly in
 Postgres `security definer` functions.
+
+The schema now stores progress as JSON objects:
+
+```json
+[
+  {
+    "index": 0,
+    "title": "Formed a team",
+    "checked": true,
+    "page-text": "",
+    "img-url": "./images/team.jpeg"
+  }
+]
+```

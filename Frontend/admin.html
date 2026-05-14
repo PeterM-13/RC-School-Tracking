@@ -82,7 +82,7 @@
          * Calculates progress percentage for a school
          */
         function calculateProgressPercentage(progressArray) {
-          const completedSteps = progressArray.filter(p => p === 1).length;
+          const completedSteps = progressArray.filter(p => p.checked === true).length;
           const percentage = (completedSteps / PROGRESS_TOTAL_STEPS) * 100;
           return Math.min(percentage, 100);
         }

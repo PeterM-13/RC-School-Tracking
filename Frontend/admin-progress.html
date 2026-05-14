@@ -230,6 +230,7 @@
         let mobileCheckboxProxies = [];
         let mobileStepButtons = [];
         let mobileCheckboxIndices = [];
+        let currentProgressItems = [];
 
         // ========================================
         // Custom Checkbox Component
@@ -375,10 +376,39 @@
           try {
             const data = await RcApi.getSchoolProgress(schoolName, schoolPassword);
             if (data.error) throw new Error(data.error);
-            updateCheckboxesFromProgress(data.progress || []);
+            applyProgressToRoadmap(data.progress || []);
           } catch (error) {
             console.error('Error fetching school progress:', error);
           }
+        }
+
+        function sortProgressItems(progressArray) {
+          return [...progressArray].sort((a, b) => a.index - b.index);
+        }
+
+        function renderHeadingFromItem(heading, item) {
+          heading.dataset.index = item.index;
+          heading.dataset.imgUrl = item['img-url'] || '';
+          heading.textContent = item.title || '';
+
+          if (item['page-text']) {
+            const tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = item['page-text'];
+            heading.appendChild(tooltip);
+          }
+        }
+
+        function applyProgressToRoadmap(progressArray) {
+          currentProgressItems = sortProgressItems(progressArray);
+
+          document.querySelectorAll('h3.clickh3').forEach((heading, index) => {
+            const item = currentProgressItems[index];
+            if (item) renderHeadingFromItem(heading, item);
+          });
+
+          updateCheckboxesFromProgress(currentProgressItems);
+          setupMobileList();
         }
 
         /*
@@ -387,7 +417,8 @@
         function updateCheckboxesFromProgress(progressArray) {
           const checkboxes = document.querySelectorAll('custom-checkbox');
           checkboxes.forEach((checkbox, index) => {
-            checkbox.setChecked(progressArray[index] === 1);
+            const item = progressArray[index];
+            checkbox.setChecked(Boolean(item.checked));
           });
           updateProgressBar();
         }
@@ -397,7 +428,26 @@
          */
         function collectProgressData() {
           const checkboxes = document.querySelectorAll('custom-checkbox');
-          return Array.from(checkboxes).map(checkbox => checkbox.isChecked() ? 1 : 0);
+          const headings = Array.from(document.querySelectorAll('h3.clickh3'));
+          return Array.from(checkboxes).map((checkbox, index) => {
+            const heading = headings[index];
+            const existingItem = currentProgressItems[index] || {};
+            const tooltipText = heading?.querySelector('.tooltip')?.textContent?.trim() || '';
+            const titleText = Array.from(heading?.childNodes || [])
+              .filter(node => node.nodeType === Node.TEXT_NODE)
+              .map(node => node.textContent)
+              .join(' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+
+            return {
+              index,
+              title: titleText || existingItem.title || '',
+              checked: checkbox.isChecked(),
+              'page-text': existingItem['page-text'] || tooltipText,
+              'img-url': existingItem['img-url'] || heading?.dataset.imgUrl || ''
+            };
+          });
         }
 
         /*
@@ -448,10 +498,11 @@
         function handleHeadingImageDisplay(heading) {
           const picBg = document.querySelector('.picBg');
           const img = picBg.querySelector('img');
-          const expectedImageId = heading.id;
+          const imageUrl = heading.dataset.imgUrl || `./images/${heading.id}.jpeg`;
+          if (!imageUrl) return;
 
           // Toggle if clicking the same image
-          if (img.src.includes(`${expectedImageId}.jpeg`)) {
+          if (img.src.includes(imageUrl.replace('./', ''))) {
             const isVisible = picBg.classList.contains('show');
             picBg.classList.toggle('show', !isVisible);
             heading.style.color = isVisible ? '' : 'white';
@@ -462,7 +513,7 @@
           }
 
           // Load new image
-          img.src = `./images/${expectedImageId}.jpeg`;
+          img.src = imageUrl;
 
           // Calculate position
           const rect = heading.getBoundingClientRect();
@@ -664,10 +715,12 @@
 
             const { heading, index } = item;
             const tooltipText = heading.querySelector('.tooltip')?.textContent?.trim() || '';
-            let titleText = heading.textContent;
-            if (tooltipText) {
-              titleText = titleText.replace(tooltipText, '').trim();
-            }
+            const titleText = Array.from(heading.childNodes)
+              .filter(node => node.nodeType === Node.TEXT_NODE)
+              .map(node => node.textContent)
+              .join(' ')
+              .replace(/\s+/g, ' ')
+              .trim();
 
             const stepButton = document.createElement('button');
             stepButton.type = 'button';
@@ -727,7 +780,6 @@
         // ========================================
 
         function initialise() {
-          setupMobileList();
           fetchSchoolProgress();
           setupImageDisplay();
           setupNavigation();
