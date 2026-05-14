@@ -92,9 +92,11 @@
         async function populateSchoolDropdown() {
           const loadingElement = document.getElementById('loading');
           const dropdown = document.getElementById('school-dropdown');
+          const loadingDelay = setTimeout(() => {
+            loadingElement.style.display = 'block';
+          }, 500);
 
           try {
-            loadingElement.style.display = 'block';
             const schools = await RcApi.getSchoolNames();
 
             // Sort schools: Admin at the end, others alphabetically
@@ -111,8 +113,10 @@
               dropdown.appendChild(option);
             });
 
+            clearTimeout(loadingDelay);
             loadingElement.style.display = 'none';
           } catch (error) {
+            clearTimeout(loadingDelay);
             console.error('Error fetching schools:', error);
             loadingElement.style.display = 'block';
             loadingElement.textContent = LOADING_ERROR_MESSAGE;
