@@ -422,7 +422,7 @@ h3.clickh3:hover {
     padding-top: 5rem;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease, height 0.25s ease, padding 0.25s ease;
     transform: scale(0.95) translate(0px, 0px);
 }
 
@@ -577,6 +577,70 @@ h3.clickh3:hover {
 
 .mobile-divider span {
     white-space: nowrap;
+}
+
+custom-checkbox {
+    position: relative;
+}
+
+.picBg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.picBg.editing-roadmap {
+    height: 28.75rem;
+    padding: 5.25rem 1rem 1rem;
+}
+
+.picBg.editing-roadmap img {
+    height: 19.5rem;
+    flex: 0 0 auto;
+}
+
+.roadmap-edit-form {
+    width: 100%;
+}
+
+.roadmap-page-input {
+    width: 100%;
+    height: 2.3rem;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    padding: 0.35rem 0.55rem;
+    font: inherit;
+    letter-spacing: 1px;
+    color: var(--color-primary);
+}
+
+.roadmap-page-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.roadmap-title-input {
+    width: 100%;
+    height: 3.8rem;
+    box-sizing: border-box;
+    border: 2px solid var(--color-accent);
+    border-radius: 4px;
+    background: white;
+    color: var(--color-primary);
+    font: inherit;
+    letter-spacing: inherit;
+    line-height: 28px;
+    text-align: inherit;
+    padding: 0.1rem 0.25rem;
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    white-space: normal;
+}
+
+h3.clickh3.editing-title {
+    width: 96.5%;
+    max-width: 30rem;
 }
 
 /* ========================================================================
