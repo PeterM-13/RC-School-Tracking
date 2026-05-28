@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="school-progress.css?v=2026-02-27-1">
+    <link rel="stylesheet" href="admin-progress.css?v=2026-05-14-1">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +44,7 @@
             </div>
             <div id="clickTitle">
                 <img id="cursor" src="images/cursor.png" alt="Cursor press">
-                <h2>Click each title to view image</h2>
+                <h2>Click each title to view & edit the info</h2>
             </div>
             <span class="terminal">Start</span>
         </section>
@@ -219,6 +219,7 @@
         const TOTAL_PROGRESS_STEPS = 31;
         const PROGRESS_SAVE_INTERVAL = 3000; // 3 seconds
         const PROGRESS_SYNC_INTERVAL = 7000; // 7 seconds
+        const MAX_ROADMAP_TITLE_LENGTH = 78;
         const CONFETTI_COUNT = 100;
         const CONFETTI_ANIMATION_DURATION = 2;
         const CONFETTI_COLORS = ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33A8'];
@@ -231,6 +232,7 @@
         let mobileStepButtons = [];
         let mobileCheckboxIndices = [];
         let currentProgressItems = [];
+        let activeRoadmapHeading = null;
 
         // ========================================
         // Custom Checkbox Component
@@ -389,6 +391,7 @@
         function renderHeadingFromItem(heading, item) {
           heading.dataset.index = item.index;
           heading.dataset.imgUrl = item['img-url'] || '';
+          heading.dataset.pageText = item['page-text'] || '';
           heading.textContent = item.title || '';
 
           if (item['page-text']) {
@@ -444,7 +447,7 @@
               index,
               title: titleText || existingItem.title || '',
               checked: checkbox.isChecked(),
-              'page-text': existingItem['page-text'] || tooltipText,
+              'page-text': heading?.dataset.pageText ?? tooltipText,
               'img-url': existingItem['img-url'] || heading?.dataset.imgUrl || ''
             };
           });
@@ -490,6 +493,17 @@
               }
             });
           });
+
+          document.addEventListener('pointerdown', (event) => {
+            const picBg = document.querySelector('.picBg');
+            if (
+              activeRoadmapHeading &&
+              !event.target.closest('h3.clickh3') &&
+              !picBg.contains(event.target)
+            ) {
+              commitRoadmapEdit();
+            }
+          });
         }
 
         /*
@@ -507,16 +521,20 @@
             picBg.classList.toggle('show', !isVisible);
 
             if (isVisible) {
+              commitRoadmapEdit();
               heading.style.color = '';
               heading.style.zIndex = '';
               resetCheckboxHighlight(heading);
             } else {
+              activateRoadmapEdit(heading);
               heading.style.color = 'white';
               heading.style.zIndex = '1100';
               highlightCheckbox(heading);
             }
             return;
           }
+
+          commitRoadmapEdit();
 
           // Load new image
           img.src = imageUrl;
@@ -543,6 +561,7 @@
           heading.style.color = 'white';
           heading.style.zIndex = '1100';
           const checkbox = highlightCheckbox(heading);
+          activateRoadmapEdit(heading);
 
           // Reset other elements
           document.querySelectorAll('h3.clickh3').forEach(otherHeading => {
@@ -588,6 +607,87 @@
           }
 
           return checkbox;
+        }
+
+        function activateRoadmapEdit(heading) {
+          activeRoadmapHeading = heading;
+          heading.classList.add('editing-title');
+          const itemIndex = Number(heading.dataset.index);
+          const item = currentProgressItems[itemIndex];
+          if (!item) return;
+
+          if (!heading.querySelector('.roadmap-title-input')) {
+            heading.textContent = '';
+            const input = document.createElement('textarea');
+            input.className = 'roadmap-title-input';
+            input.value = item.title || '';
+            input.rows = 2;
+            input.maxLength = MAX_ROADMAP_TITLE_LENGTH;
+            input.setAttribute('aria-label', `Roadmap step ${item.index + 1} title`);
+            input.addEventListener('click', (event) => event.stopPropagation());
+            input.addEventListener('input', () => {
+              currentProgressItems[itemIndex].title = input.value;
+              hasProgressChanged = true;
+            });
+            heading.appendChild(input);
+            input.focus();
+          }
+
+          renderRoadmapEditForm(heading, item);
+        }
+
+        function renderRoadmapEditForm(heading, item) {
+          const picBg = document.querySelector('.picBg');
+          let form = picBg.querySelector('.roadmap-edit-form');
+          if (!form) {
+            form = document.createElement('div');
+            form.className = 'roadmap-edit-form';
+            form.addEventListener('click', (event) => event.stopPropagation());
+            picBg.appendChild(form);
+          }
+          picBg.classList.add('editing-roadmap');
+
+          form.innerHTML = '';
+          const pageInput = document.createElement('input');
+          pageInput.type = 'text';
+          pageInput.className = 'roadmap-page-input';
+          pageInput.placeholder = 'User guide pages (e.g. "Pages 19-22")';
+          pageInput.value = item['page-text'] || '';
+          pageInput.setAttribute('aria-label', `Roadmap step ${item.index + 1} page tooltip`);
+          pageInput.addEventListener('input', () => {
+            currentProgressItems[item.index]['page-text'] = pageInput.value;
+            heading.dataset.pageText = pageInput.value;
+            hasProgressChanged = true;
+          });
+
+          form.appendChild(pageInput);
+        }
+
+        function commitRoadmapEdit() {
+          if (!activeRoadmapHeading) return;
+
+          const heading = activeRoadmapHeading;
+          const itemIndex = Number(heading.dataset.index);
+          const item = currentProgressItems[itemIndex];
+          const input = heading.querySelector('.roadmap-title-input');
+
+          heading.classList.remove('editing-title');
+
+          if (item && input) {
+            item.title = input.value.trim();
+            item['page-text'] = heading.dataset.pageText || '';
+            renderHeadingFromItem(heading, item);
+            setupMobileList();
+          }
+
+          const form = document.querySelector('.roadmap-edit-form');
+          if (form) form.remove();
+          document.querySelector('.picBg')?.classList.remove('editing-roadmap');
+          activeRoadmapHeading = null;
+
+          if (hasProgressChanged) {
+            saveProgressToServer();
+          }
         }
 
         // ========================================
@@ -801,7 +901,7 @@
 
           // Sync progress from server every 7 seconds if not currently editing
           setInterval(async () => {
-            if (!hasProgressChanged) {
+            if (!hasProgressChanged && !activeRoadmapHeading) {
               await fetchSchoolProgress();
             }
           }, PROGRESS_SYNC_INTERVAL);

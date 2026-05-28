@@ -9,6 +9,9 @@
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
     <title>Schools Progress</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-api.js"></script>
 </head>
 <body>
     <header>
@@ -22,7 +25,6 @@
     </main>
 
     <script>
-        const API_BASE_URL = 'https://rc-school-tracking.onrender.com';
         const PROGRESS_TOTAL_STEPS = 31;
 
         // ========================================
@@ -68,7 +70,7 @@
          * Calculates progress percentage for a school
          */
         function calculateProgressPercentage(progressArray) {
-          const completedSteps = progressArray.filter(p => p === 1).length;
+          const completedSteps = progressArray.filter(p => p.checked === true).length;
           const percentage = (completedSteps / PROGRESS_TOTAL_STEPS) * 100;
           return Math.min(percentage, 100);
         }
@@ -80,8 +82,11 @@
           const progressContainer = document.querySelector('main');
 
           try {
-            const response = await fetch(`${API_BASE_URL}/school-progress-all`);
-            const schools = await response.json();
+            const params = new URLSearchParams(window.location.search);
+            const schools = await RcApi.listSchoolProgress({
+              name: params.get('school'),
+              password: params.get('key')
+            });
 
             // Sort schools: Admin first, then by progress percentage (descending), then alphabetically
             schools.sort((schoolA, schoolB) => {
