@@ -44,7 +44,7 @@ Constraints:
     "title": "Formed a team",
     "checked": false,
     "page-text": "",
-    "img-url": "./images/team.jpeg"
+    "img-url": "https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/team.jpeg"
   }
 ]
 ```

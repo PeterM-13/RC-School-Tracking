@@ -25,6 +25,26 @@
     return data;
   }
 
+  async function uploadRoadmapImage(filePath, file) {
+    const { data, error } = await client.storage
+      .from('Roadmap-Images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        contentType: file.type || 'application/octet-stream',
+        upsert: false
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    const { data: publicUrlData } = client.storage
+      .from('Roadmap-Images')
+      .getPublicUrl(data.path);
+
+    return publicUrlData.publicUrl;
+  }
+
   window.RcApi = {
     getSchoolNames() {
       return rpc('get_school_names');
@@ -73,6 +93,18 @@
         p_name: name,
         p_password: password,
         p_progress: progress
+      });
+    },
+
+    uploadRoadmapImage(filePath, file) {
+      return uploadRoadmapImage(filePath, file);
+    },
+
+    updateRoadmapImage(adminKey, stepIndex, imageUrl) {
+      return rpc('update_roadmap_image', {
+        p_admin_key: adminKey,
+        p_step_index: stepIndex,
+        p_img_url: imageUrl
       });
     },
 

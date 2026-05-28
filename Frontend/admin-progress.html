@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="admin-progress.css?v=2026-05-14-1">
+    <link rel="stylesheet" href="admin-progress.css?v=2026-05-28-1">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,6 +221,7 @@
         const PROGRESS_SAVE_INTERVAL = 3000; // 3 seconds
         const PROGRESS_SYNC_INTERVAL = 7000; // 7 seconds
         const MAX_ROADMAP_TITLE_LENGTH = 78;
+        const ROADMAP_IMAGE_BUCKET_FOLDER = 'roadmap';
         const CONFETTI_COUNT = 100;
         const CONFETTI_ANIMATION_DURATION = 2;
         const CONFETTI_COLORS = ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33A8'];
@@ -234,6 +235,7 @@
         let mobileCheckboxIndices = [];
         let currentProgressItems = [];
         let activeRoadmapHeading = null;
+        let roadmapImageInput = null;
 
         // ========================================
         // Custom Checkbox Component
@@ -500,6 +502,19 @@
               commitRoadmapEdit();
             }
           });
+
+          roadmapImageInput = document.createElement('input');
+          roadmapImageInput.type = 'file';
+          roadmapImageInput.accept = 'image/*';
+          roadmapImageInput.className = 'roadmap-image-file-input';
+          roadmapImageInput.addEventListener('change', async () => {
+            const file = roadmapImageInput.files?.[0];
+            roadmapImageInput.value = '';
+            if (file) {
+              await uploadSelectedRoadmapImage(file);
+            }
+          });
+          document.body.appendChild(roadmapImageInput);
         }
 
         /*
@@ -508,7 +523,7 @@
         function handleHeadingImageDisplay(heading) {
           const picBg = document.querySelector('.picBg');
           const img = picBg.querySelector('img');
-          const imageUrl = heading.dataset.imgUrl || `./images/${heading.id}.jpeg`;
+          const imageUrl = heading.dataset.imgUrl || `https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/${heading.id}.jpeg`;
           if (!imageUrl) return;
 
           // Toggle if clicking the same image
@@ -605,6 +620,67 @@
           return checkbox;
         }
 
+        function ensureRoadmapUploadButton() {
+          const picBg = document.querySelector('.picBg');
+          let button = picBg.querySelector('.roadmap-image-upload');
+          if (!button) {
+            button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'roadmap-image-upload';
+            button.setAttribute('aria-label', 'Upload new roadmap image');
+            button.innerHTML = '<img src="icons/upload.png" alt="">';
+            button.addEventListener('click', (event) => {
+              event.stopPropagation();
+              roadmapImageInput?.click();
+            });
+            picBg.appendChild(button);
+          }
+          return button;
+        }
+
+        function getFileExtension(file) {
+          const nameExtension = file.name.split('.').pop()?.toLowerCase();
+          if (nameExtension && /^[a-z0-9]+$/.test(nameExtension)) return nameExtension;
+
+          const mimeExtension = file.type.split('/').pop()?.toLowerCase();
+          return mimeExtension && /^[a-z0-9]+$/.test(mimeExtension) ? mimeExtension : 'jpg';
+        }
+
+        async function uploadSelectedRoadmapImage(file) {
+          if (!activeRoadmapHeading || !file.type.startsWith('image/')) return;
+
+          const { adminKey, key } = RcAuth.getAuthSession();
+          const effectiveAdminKey = adminKey || key;
+          const itemIndex = Number(activeRoadmapHeading.dataset.index);
+          const item = currentProgressItems[itemIndex];
+          if (!item) return;
+
+          const picBg = document.querySelector('.picBg');
+          const uploadButton = ensureRoadmapUploadButton();
+          const hadPendingChanges = hasProgressChanged;
+          picBg.classList.add('uploading-roadmap-image');
+          uploadButton.disabled = true;
+
+          try {
+            const extension = getFileExtension(file);
+            const filePath = `${ROADMAP_IMAGE_BUCKET_FOLDER}/step-${item.index}-${Date.now()}.${extension}`;
+            const publicUrl = await RcApi.uploadRoadmapImage(filePath, file);
+
+            await RcApi.updateRoadmapImage(effectiveAdminKey, item.index, publicUrl);
+
+            item['img-url'] = publicUrl;
+            activeRoadmapHeading.dataset.imgUrl = publicUrl;
+            picBg.querySelector('img').src = publicUrl;
+            hasProgressChanged = hadPendingChanges;
+          } catch (error) {
+            console.error('Error uploading roadmap image:', error);
+            alert('The image could not be uploaded. Please try again.');
+          } finally {
+            picBg.classList.remove('uploading-roadmap-image');
+            uploadButton.disabled = false;
+          }
+        }
+
         function activateRoadmapEdit(heading) {
           activeRoadmapHeading = heading;
           heading.classList.add('editing-title');
@@ -642,6 +718,7 @@
             picBg.appendChild(form);
           }
           picBg.classList.add('editing-roadmap');
+          ensureRoadmapUploadButton();
 
           form.innerHTML = '';
           const pageInput = document.createElement('input');
@@ -721,8 +798,8 @@
          * Validates authentication parameters
          */
         function validateAuth() {
-          if (!RcAuth.requireAuthSession()) {
-            alert('Error: Cannot find school login details. Please login again.');
+          if (!RcAuth.requireAuthSession({ adminOnly: true })) {
+            alert('Error: Cannot find admin login details. Please login again.');
             return false;
           }
           return true;

@@ -494,7 +494,7 @@
         function handleHeadingImageDisplay(heading) {
           const picBg = document.querySelector('.picBg');
           const img = picBg.querySelector('img');
-          const imageUrl = heading.dataset.imgUrl || `./images/${heading.id}.jpeg`;
+          const imageUrl = heading.dataset.imgUrl || `https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/${heading.id}.jpeg`;
           if (!imageUrl) return;
 
           // Toggle if clicking the same image

@@ -599,6 +599,58 @@ custom-checkbox {
     flex: 0 0 auto;
 }
 
+.roadmap-image-file-input {
+    display: none;
+}
+
+.roadmap-image-upload {
+    position: absolute;
+    top: 5.25rem;
+    left: 1rem;
+    width: calc(100% - 2rem);
+    height: 19.5rem;
+    border: 0;
+    border-radius: var(--border-radius);
+    background: rgba(0, 0, 0, 0.48);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.picBg.editing-roadmap .roadmap-image-upload {
+    display: flex;
+}
+
+.roadmap-image-upload img {
+    width: 4.25rem;
+    height: 4.25rem !important;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.45));
+    opacity: 0.96;
+}
+
+.roadmap-image-upload:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: -6px;
+}
+
+.roadmap-image-upload:disabled {
+    cursor: wait;
+}
+
+.picBg.uploading-roadmap-image .roadmap-image-upload::after {
+    content: 'Uploading...';
+    position: absolute;
+    bottom: 1.3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    letter-spacing: 1px;
+    font-size: 1rem;
+}
+
 .roadmap-edit-form {
     width: 100%;
 }

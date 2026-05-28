@@ -39,6 +39,28 @@ revoke all on table public.school_progress from anon;
 revoke all on table public.school_progress from authenticated;
 revoke all on table public.school_progress from public;
 
+-- The admin progress page uploads directly to this public Storage bucket with the
+-- publishable anon key, then stores the returned public URL via update_roadmap_image.
+insert into storage.buckets (id, name, public)
+values ('Roadmap-Images', 'Roadmap-Images', true)
+on conflict (id) do update
+set public = true;
+
+drop policy if exists "Public roadmap image reads" on storage.objects;
+drop policy if exists "Anon roadmap image uploads" on storage.objects;
+
+create policy "Public roadmap image reads"
+on storage.objects
+for select
+to anon, authenticated
+using (bucket_id = 'Roadmap-Images');
+
+create policy "Anon roadmap image uploads"
+on storage.objects
+for insert
+to anon, authenticated
+with check (bucket_id = 'Roadmap-Images');
+
 create or replace function public.school_password_matches(p_school text, p_password text)
 returns boolean
 language sql
@@ -68,37 +90,37 @@ language sql
 immutable
 as $$
   select jsonb_build_array(
-    jsonb_build_object('index', 0, 'title', 'Formed a team', 'checked', false, 'page-text', '', 'img-url', './images/team.jpeg'),
-    jsonb_build_object('index', 1, 'title', 'Checked components & identified any missing parts', 'checked', false, 'page-text', 'Pages 63-65', 'img-url', './images/parts.jpeg'),
-    jsonb_build_object('index', 2, 'title', 'Received the kit', 'checked', false, 'page-text', '', 'img-url', './images/kit.jpeg'),
-    jsonb_build_object('index', 3, 'title', 'Cut & drilled & counter-sunk holes in the MDF wood', 'checked', false, 'page-text', 'Pages 19-22', 'img-url', './images/cutmdf.jpeg'),
-    jsonb_build_object('index', 4, 'title', 'Cut & drilled & counter-sunk holes in aluminium brackets', 'checked', false, 'page-text', 'Pages 23-24', 'img-url', './images/alum.jpeg'),
-    jsonb_build_object('index', 5, 'title', 'Fully assembled the chassis', 'checked', false, 'page-text', '', 'img-url', './images/chassis.jpeg'),
-    jsonb_build_object('index', 6, 'title', 'Replaced both drill chucks with wheels', 'checked', false, 'page-text', 'Pages 25', 'img-url', './images/chuck.jpeg'),
-    jsonb_build_object('index', 7, 'title', 'Dismantled both drills', 'checked', false, 'page-text', 'Pages 26-27', 'img-url', './images/dsmtl.jpeg'),
-    jsonb_build_object('index', 8, 'title', 'Cut drill cases to size & drilled holes & crimped wires', 'checked', false, 'page-text', 'Pages 28-30', 'img-url', './images/drillcut.jpeg'),
-    jsonb_build_object('index', 9, 'title', 'Fitted motors to chassis', 'checked', false, 'page-text', 'Page 31', 'img-url', './images/motors.jpeg'),
-    jsonb_build_object('index', 10, 'title', 'Fitted balancing wheels to chassis', 'checked', false, 'page-text', 'Page 32', 'img-url', './images/balance.jpeg'),
-    jsonb_build_object('index', 11, 'title', 'Fitted batteries to chassis', 'checked', false, 'page-text', 'Page 33', 'img-url', './images/battery.jpeg'),
-    jsonb_build_object('index', 12, 'title', 'Fitted rear safety lights & tow hook', 'checked', false, 'page-text', 'Page 34', 'img-url', './images/rear.jpeg'),
-    jsonb_build_object('index', 13, 'title', 'Soldered 1st PCB', 'checked', false, 'page-text', 'Pages 38-43', 'img-url', './images/pcb.jpeg'),
-    jsonb_build_object('index', 14, 'title', 'Soldered 2nd PCB', 'checked', false, 'page-text', 'Pages 38-43', 'img-url', './images/pcb2.jpeg'),
-    jsonb_build_object('index', 15, 'title', 'Made test equipment', 'checked', false, 'page-text', 'Page 44', 'img-url', './images/testEquip.jpeg'),
-    jsonb_build_object('index', 16, 'title', 'Checked 1st PCB board voltages (without PIC)', 'checked', false, 'page-text', 'Pages 46-47', 'img-url', './images/voltages.jpeg'),
-    jsonb_build_object('index', 17, 'title', 'Checked 2nd PCB board voltages (without PIC)', 'checked', false, 'page-text', 'Pages 46-47', 'img-url', './images/voltages2.jpeg'),
-    jsonb_build_object('index', 18, 'title', 'Tested 1st PCB LED (with PIC)', 'checked', false, 'page-text', 'Page 47', 'img-url', './images/lamptest.jpeg'),
-    jsonb_build_object('index', 19, 'title', 'Tested 2nd PCB LED (with PIC)', 'checked', false, 'page-text', 'Page 47', 'img-url', './images/lamptest2.jpeg'),
-    jsonb_build_object('index', 20, 'title', 'Tested 1st PCB with motor (with PIC & driver IC)', 'checked', false, 'page-text', 'Page 48', 'img-url', './images/motortest.jpeg'),
-    jsonb_build_object('index', 21, 'title', 'Tested 2nd PCB with motor (with PIC & driver IC)', 'checked', false, 'page-text', 'Page 48', 'img-url', './images/motortest2.jpeg'),
-    jsonb_build_object('index', 22, 'title', '1st PCB works!', 'checked', false, 'page-text', '', 'img-url', './images/pcbw1.jpeg'),
-    jsonb_build_object('index', 23, 'title', '2nd PCB works!', 'checked', false, 'page-text', '', 'img-url', './images/pcbw2.jpeg'),
-    jsonb_build_object('index', 24, 'title', 'Fitted PCB Boards to chassis', 'checked', false, 'page-text', 'Page 50', 'img-url', './images/pcbs.jpeg'),
-    jsonb_build_object('index', 25, 'title', 'Added a fuse and switch to wiring', 'checked', false, 'page-text', 'Page 52', 'img-url', './images/fuse.jpeg'),
-    jsonb_build_object('index', 26, 'title', 'Driven working chariot around!', 'checked', false, 'page-text', 'Page 51', 'img-url', './images/drive.jpeg'),
-    jsonb_build_object('index', 27, 'title', 'Arrived at Leonardo on the 27th of June for the competition', 'checked', false, 'page-text', '', 'img-url', './images/site.jpeg'),
-    jsonb_build_object('index', 28, 'title', 'Fitted Radio Receiver to chassis', 'checked', false, 'page-text', 'Page 35', 'img-url', './images/radio.jpeg'),
-    jsonb_build_object('index', 29, 'title', 'Adjusted remote controller trim', 'checked', false, 'page-text', '', 'img-url', './images/trim.jpeg'),
-    jsonb_build_object('index', 30, 'title', 'Performed the M.O.T.', 'checked', false, 'page-text', '', 'img-url', './images/mot.jpeg')
+    jsonb_build_object('index', 0, 'title', 'Formed a team', 'checked', false, 'page-text', '', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/team.jpeg'),
+    jsonb_build_object('index', 1, 'title', 'Checked components & identified any missing parts', 'checked', false, 'page-text', 'Pages 63-65', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/parts.jpeg'),
+    jsonb_build_object('index', 2, 'title', 'Received the kit', 'checked', false, 'page-text', '', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/kit.jpeg'),
+    jsonb_build_object('index', 3, 'title', 'Cut & drilled & counter-sunk holes in the MDF wood', 'checked', false, 'page-text', 'Pages 19-22', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/cutmdf.jpeg'),
+    jsonb_build_object('index', 4, 'title', 'Cut & drilled & counter-sunk holes in aluminium brackets', 'checked', false, 'page-text', 'Pages 23-24', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/alum.jpeg'),
+    jsonb_build_object('index', 5, 'title', 'Fully assembled the chassis', 'checked', false, 'page-text', '', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/chassis.jpeg'),
+    jsonb_build_object('index', 6, 'title', 'Replaced both drill chucks with wheels', 'checked', false, 'page-text', 'Pages 25', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/chuck.jpeg'),
+    jsonb_build_object('index', 7, 'title', 'Dismantled both drills', 'checked', false, 'page-text', 'Pages 26-27', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/dsmtl.jpeg'),
+    jsonb_build_object('index', 8, 'title', 'Cut drill cases to size & drilled holes & crimped wires', 'checked', false, 'page-text', 'Pages 28-30', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/drillcut.jpeg'),
+    jsonb_build_object('index', 9, 'title', 'Fitted motors to chassis', 'checked', false, 'page-text', 'Page 31', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/motors.jpeg'),
+    jsonb_build_object('index', 10, 'title', 'Fitted balancing wheels to chassis', 'checked', false, 'page-text', 'Page 32', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/balance.jpeg'),
+    jsonb_build_object('index', 11, 'title', 'Fitted batteries to chassis', 'checked', false, 'page-text', 'Page 33', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/battery.jpeg'),
+    jsonb_build_object('index', 12, 'title', 'Fitted rear safety lights & tow hook', 'checked', false, 'page-text', 'Page 34', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/rear.jpeg'),
+    jsonb_build_object('index', 13, 'title', 'Soldered 1st PCB', 'checked', false, 'page-text', 'Pages 38-43', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/pcb.jpeg'),
+    jsonb_build_object('index', 14, 'title', 'Soldered 2nd PCB', 'checked', false, 'page-text', 'Pages 38-43', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/pcb2.jpeg'),
+    jsonb_build_object('index', 15, 'title', 'Made test equipment', 'checked', false, 'page-text', 'Page 44', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/testEquip.jpeg'),
+    jsonb_build_object('index', 16, 'title', 'Checked 1st PCB board voltages (without PIC)', 'checked', false, 'page-text', 'Pages 46-47', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/voltages.jpeg'),
+    jsonb_build_object('index', 17, 'title', 'Checked 2nd PCB board voltages (without PIC)', 'checked', false, 'page-text', 'Pages 46-47', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/voltages2.jpeg'),
+    jsonb_build_object('index', 18, 'title', 'Tested 1st PCB LED (with PIC)', 'checked', false, 'page-text', 'Page 47', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/lamptest.jpeg'),
+    jsonb_build_object('index', 19, 'title', 'Tested 2nd PCB LED (with PIC)', 'checked', false, 'page-text', 'Page 47', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/lamptest2.jpeg'),
+    jsonb_build_object('index', 20, 'title', 'Tested 1st PCB with motor (with PIC & driver IC)', 'checked', false, 'page-text', 'Page 48', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/motortest.jpeg'),
+    jsonb_build_object('index', 21, 'title', 'Tested 2nd PCB with motor (with PIC & driver IC)', 'checked', false, 'page-text', 'Page 48', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/motortest2.jpeg'),
+    jsonb_build_object('index', 22, 'title', '1st PCB works!', 'checked', false, 'page-text', '', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/pcbw1.jpeg'),
+    jsonb_build_object('index', 23, 'title', '2nd PCB works!', 'checked', false, 'page-text', '', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/pcbw2.jpeg'),
+    jsonb_build_object('index', 24, 'title', 'Fitted PCB Boards to chassis', 'checked', false, 'page-text', 'Page 50', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/pcbs.jpeg'),
+    jsonb_build_object('index', 25, 'title', 'Added a fuse and switch to wiring', 'checked', false, 'page-text', 'Page 52', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/fuse.jpeg'),
+    jsonb_build_object('index', 26, 'title', 'Driven working chariot around!', 'checked', false, 'page-text', 'Page 51', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/drive.jpeg'),
+    jsonb_build_object('index', 27, 'title', 'Arrived at Leonardo on the 27th of June for the competition', 'checked', false, 'page-text', '', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/site.jpeg'),
+    jsonb_build_object('index', 28, 'title', 'Fitted Radio Receiver to chassis', 'checked', false, 'page-text', 'Page 35', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/radio.jpeg'),
+    jsonb_build_object('index', 29, 'title', 'Adjusted remote controller trim', 'checked', false, 'page-text', '', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/trim.jpeg'),
+    jsonb_build_object('index', 30, 'title', 'Performed the M.O.T.', 'checked', false, 'page-text', '', 'img-url', 'https://togmxgkpdfmfklcungfa.supabase.co/storage/v1/object/public/Roadmap-Images/mot.jpeg')
   );
 $$;
 
@@ -296,6 +318,74 @@ begin
   end if;
 
   return jsonb_build_object('school', updated_school.school, 'progress', updated_school.progress);
+end;
+$$;
+
+create or replace function public.update_roadmap_image(
+  p_admin_key text,
+  p_step_index integer,
+  p_img_url text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  admin_progress jsonb;
+  updated_progress jsonb;
+  matched_count integer;
+begin
+  if not public.admin_password_matches(p_admin_key) then
+    raise exception 'Incorrect admin password' using errcode = '28000';
+  end if;
+
+  if p_step_index is null or p_step_index < 0 then
+    raise exception 'Invalid roadmap step index' using errcode = '22023';
+  end if;
+
+  if nullif(trim(p_img_url), '') is null then
+    raise exception 'Image URL is required' using errcode = '22023';
+  end if;
+
+  select sp.progress
+  into admin_progress
+  from public.school_progress sp
+  where sp.school = 'Admin'
+  for update;
+
+  if admin_progress is null then
+    raise exception 'Admin roadmap not found' using errcode = '02000';
+  end if;
+
+  select count(*)::integer
+  into matched_count
+  from jsonb_array_elements(admin_progress) as item
+  where (item->>'index')::integer = p_step_index;
+
+  if matched_count = 0 then
+    raise exception 'Roadmap step not found' using errcode = '02000';
+  end if;
+
+  select jsonb_agg(
+    case
+      when (item->>'index')::integer = p_step_index then item || jsonb_build_object('img-url', trim(p_img_url))
+      else item
+    end
+    order by ordinality
+  )
+  into updated_progress
+  from jsonb_array_elements(admin_progress) with ordinality as steps(item, ordinality);
+
+  update public.school_progress
+  set progress = updated_progress
+  where school = 'Admin';
+
+  return jsonb_build_object(
+    'success', true,
+    'index', p_step_index,
+    'img-url', trim(p_img_url)
+  );
 end;
 $$;
 
@@ -537,6 +627,7 @@ grant execute on function public.list_school_progress(text, text, text) to anon,
 grant execute on function public.create_school(text, text, text) to anon, authenticated;
 grant execute on function public.delete_school(text, text, text) to anon, authenticated;
 grant execute on function public.update_school_progress(text, text, jsonb) to anon, authenticated;
+grant execute on function public.update_roadmap_image(text, integer, text) to anon, authenticated;
 grant execute on function public.reset_all_progress(text) to anon, authenticated;
 grant execute on function public.get_comments(text, text) to anon, authenticated;
 grant execute on function public.add_comment(text, text, text, text) to anon, authenticated;

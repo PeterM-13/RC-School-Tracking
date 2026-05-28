@@ -51,7 +51,7 @@ h2 {
   padding: 0 1rem;
   margin-bottom: 2rem;
   font-size: 1rem;
-  letter-spacing: var(--font-spacing);
+  letter-spacing: var(--font-spacing-p);
   background-color: var(--color-secondary);
   outline: none;
   appearance: none;
