@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-api.js"></script>
+    <script src="js/auth.js"></script>
 </head>
 <body>
     <header>
@@ -158,9 +159,10 @@
           const progressContainer = document.querySelector('section');
 
           try {
-            const urlParams = new URLSearchParams(window.location.search);
+            const { key, adminKey: storedAdminKey } = RcAuth.getAuthSession();
+            const adminKey = storedAdminKey || key;
             const schools = await RcApi.listSchoolProgress({
-              adminKey: urlParams.get('key')
+              adminKey
             });
 
             // Sort schools: Admin first, then by progress percentage (descending), then alphabetically
@@ -255,7 +257,8 @@
          */
         async function editSchoolProgress(schoolName, adminKey) {
           if (schoolName === 'Admin') {
-            window.location.href = `admin-progress.html?school=${encodeURIComponent(schoolName)}&key=${encodeURIComponent(adminKey)}&adminKey=${encodeURIComponent(adminKey)}`;
+            RcAuth.setAuthSession({ school: schoolName, key: adminKey, adminKey });
+            window.location.href = 'admin-progress.html';
             return;
           }
 
@@ -268,7 +271,8 @@
             const result = await RcApi.verifySchoolPassword(schoolName, password);
 
             if (result.success) {
-              window.location.href = `school-progress.html?school=${encodeURIComponent(schoolName)}&key=${encodeURIComponent(password)}&adminKey=${encodeURIComponent(adminKey)}`;
+              RcAuth.setAuthSession({ school: schoolName, key: password, adminKey });
+              window.location.href = 'school-progress.html';
             } else {
               alert('Incorrect password.');
             }
@@ -286,7 +290,8 @@
           const password = prompt(`Enter password for ${schoolName}:`, defaultPassword);
 
           if (password) {
-            window.location.href = `./documents.html?school=${encodeURIComponent(schoolName)}&key=${encodeURIComponent(password)}&adminKey=${encodeURIComponent(adminKey)}`;
+            RcAuth.setAuthSession({ school: schoolName, key: password, adminKey });
+            window.location.href = './documents.html';
           }
         }
 
@@ -415,8 +420,10 @@
         // ========================================
 
         document.addEventListener('DOMContentLoaded', async () => {
-          const urlParams = new URLSearchParams(window.location.search);
-          const adminKey = urlParams.get('key');
+          const auth = RcAuth.requireAuthSession({ adminOnly: true });
+          if (!auth) return;
+
+          const adminKey = auth.adminKey || auth.key;
 
           // Load school progress
           await loadAndDisplaySchoolProgress();

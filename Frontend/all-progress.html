@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-api.js"></script>
+    <script src="js/auth.js"></script>
 </head>
 <body>
     <header>
@@ -82,10 +83,10 @@
           const progressContainer = document.querySelector('main');
 
           try {
-            const params = new URLSearchParams(window.location.search);
+            const { school, key } = RcAuth.getAuthSession();
             const schools = await RcApi.listSchoolProgress({
-              name: params.get('school'),
-              password: params.get('key')
+              name: school,
+              password: key
             });
 
             // Sort schools: Admin first, then by progress percentage (descending), then alphabetically
@@ -120,18 +121,17 @@
 
         document.getElementById('back').addEventListener('click', function (event) {
           event.preventDefault();
-          const params = new URLSearchParams(window.location.search);
-          const school = params.get('school');
-          const key = params.get('key');
-          const backUrl = `./school-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
-          window.location.href = backUrl;
+          window.location.href = './school-progress.html';
         });
 
         // ========================================
         // Initialisation
         // ========================================
 
-        document.addEventListener('DOMContentLoaded', loadAndDisplaySchoolProgress);
+        document.addEventListener('DOMContentLoaded', () => {
+          if (!RcAuth.requireAuthSession()) return;
+          loadAndDisplaySchoolProgress();
+        });
     </script>
     
 </body>

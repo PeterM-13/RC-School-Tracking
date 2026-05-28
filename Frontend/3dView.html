@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon:wght@400&display=swap" rel="stylesheet">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <title>3D View</title>
+    <script src="js/auth.js"></script>
 </head>
 
 <body>
@@ -106,9 +107,12 @@
 
         backLink.addEventListener("click", (event) => {
             event.preventDefault();
-            const query = window.location.search;
-            window.location.href = `./school-progress.html${query}`;
+            window.location.href = './school-progress.html';
         });
+
+        if (!RcAuth.requireAuthSession()) {
+            throw new Error('Missing school login details.');
+        }
 
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

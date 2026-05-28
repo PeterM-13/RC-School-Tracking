@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-api.js"></script>
+    <script src="js/auth.js"></script>
 </head>
 
 
@@ -358,10 +359,7 @@
          * Fetches school progress from API
          */
         async function fetchSchoolProgress() {
-          const urlParams = new URLSearchParams(window.location.search);
-          const schoolName = urlParams.get('school');
-          const schoolPassword = urlParams.get('key');
-          const adminKey = urlParams.get('adminKey');
+          const { school: schoolName, key: schoolPassword, adminKey } = RcAuth.getAuthSession();
 
           if (adminKey) {
             document.getElementById('allProgLink').textContent = 'Back to Admin';
@@ -459,9 +457,7 @@
         async function saveProgressToServer() {
           if (!hasProgressChanged) return;
 
-          const urlParams = new URLSearchParams(window.location.search);
-          const schoolName = urlParams.get('school');
-          const schoolPassword = urlParams.get('key');
+          const { school: schoolName, key: schoolPassword } = RcAuth.getAuthSession();
           const progressData = collectProgressData();
 
           try {
@@ -700,36 +696,24 @@
         function setupNavigation() {
           document.getElementById('allProgLink').addEventListener('click', function (event) {
             event.preventDefault();
-            const params = new URLSearchParams(window.location.search);
-            const adminKey = params.get('adminKey');
+            const { adminKey } = RcAuth.getAuthSession();
 
             if (adminKey) {
-              window.location.href = `./admin.html?key=${encodeURIComponent(adminKey)}`;
+              RcAuth.setAuthSession({ school: 'Admin', key: adminKey, adminKey });
+              window.location.href = './admin.html';
             } else {
-              const school = params.get('school');
-              const key = params.get('key');
-              window.location.href = `./all-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
+              window.location.href = './all-progress.html';
             }
           });
 
           document.getElementById('docsLink').addEventListener('click', function (event) {
             event.preventDefault();
-            const params = new URLSearchParams(window.location.search);
-            const adminKey = params.get('adminKey');
-            const school = params.get('school');
-            const key = params.get('key');
-
-            let url = `./documents.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
-            if (adminKey) {
-              url += `&adminKey=${encodeURIComponent(adminKey)}`;
-            }
-            window.location.href = url;
+            window.location.href = './documents.html';
           });
 
           document.getElementById('view3dLink').addEventListener('click', function (event) {
             event.preventDefault();
-            const query = window.location.search;
-            window.location.href = `./3dView.html${query}`;
+            window.location.href = './3dView.html';
           });
         }
 
@@ -737,16 +721,11 @@
          * Validates authentication parameters
          */
         function validateAuth() {
-          window.addEventListener('load', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const school = urlParams.get('school');
-            const key = urlParams.get('key');
-
-            if (!school || !key || school === 'null' || key === 'null') {
-              alert('Error: Cannot find school login details. Please login again.');
-              window.location.href = './index.html';
-            }
-          });
+          if (!RcAuth.requireAuthSession()) {
+            alert('Error: Cannot find school login details. Please login again.');
+            return false;
+          }
+          return true;
         }
 
         // ========================================
@@ -891,10 +870,11 @@
         // ========================================
 
         function initialise() {
+          if (!validateAuth()) return;
+
           fetchSchoolProgress();
           setupImageDisplay();
           setupNavigation();
-          validateAuth();
 
           // Auto-save progress every 3 seconds
           setInterval(saveProgressToServer, PROGRESS_SAVE_INTERVAL);

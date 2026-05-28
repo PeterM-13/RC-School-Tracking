@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-api.js"></script>
+    <script src="js/auth.js"></script>
 </head>
 <body>
     <header>
@@ -143,7 +144,12 @@
 
             if (result.success) {
               const targetPage = selectedSchool === 'Admin' ? 'admin.html' : 'school-progress.html';
-              window.location.href = `${targetPage}?school=${encodeURIComponent(selectedSchool)}&key=${encodeURIComponent(password)}`;
+              RcAuth.setAuthSession({
+                school: selectedSchool,
+                key: password,
+                adminKey: selectedSchool === 'Admin' ? password : null
+              });
+              window.location.href = targetPage;
             } else {
               loadingElement.style.display = 'none';
               showLoginMessage('Incorrect password for selected school. Please try again.');

@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-api.js"></script>
+    <script src="js/auth.js"></script>
 </head>
 <body>
     <header>
@@ -69,8 +70,7 @@
     // ========================================
 
     function addLeonardoMessage(text, commentIndex) {
-      const params = new URLSearchParams(window.location.search);
-      const isAdminView = params.has('adminKey');
+      const isAdminView = Boolean(RcAuth.getAuthSession().adminKey);
       const messagesContainer = document.getElementById('messages');
       const messageElement = document.createElement('span');
       const messageText = document.createElement('p');
@@ -96,8 +96,7 @@
     }
 
     function addUserMessage(text, commentIndex) {
-      const params = new URLSearchParams(window.location.search);
-      const isAdminView = params.has('adminKey');// || params.get('school') == 'Admin';
+      const isAdminView = Boolean(RcAuth.getAuthSession().adminKey);
       const messagesContainer = document.getElementById('messages');
       const messageElement = document.createElement('span');
       const messageText = document.createElement('p');
@@ -143,10 +142,7 @@
      * Fetches comments and marks unviewed ones as viewed
      */
     async function fetchAndDisplayComments() {
-      const params = new URLSearchParams(window.location.search);
-      const school = params.get('school');
-      const key = params.get('key');
-      const adminKey = params.get('adminKey');
+      const { school, key, adminKey } = RcAuth.getAuthSession();
 
       if (!key) return;
 
@@ -217,10 +213,7 @@
      * Sends a new comment
      */
     async function sendComment(text) {
-      const params = new URLSearchParams(window.location.search);
-      const school = params.get('school');
-      const key = params.get('key');
-      const adminKey = params.get('adminKey');
+      const { school, key, adminKey } = RcAuth.getAuthSession();
 
       if (!school || !key) {
         alert('Missing school or authentication key');
@@ -265,10 +258,7 @@
      * Deletes a comment (admin only)
      */
     async function deleteComment(commentIndex) {
-      const params = new URLSearchParams(window.location.search);
-      const school = params.get('school');
-      const key = params.get('key');
-      const adminKey = params.get('adminKey');
+      const { school, key, adminKey } = RcAuth.getAuthSession();
 
       if (!school || !key || !adminKey) {
         alert('Missing school or authentication key');
@@ -314,17 +304,14 @@
 
     document.getElementById('back').addEventListener('click', function (event) {
       event.preventDefault();
-      const params = new URLSearchParams(window.location.search);
-      const school = params.get('school');
-      const key = params.get('key');
-      const adminKey = params.get('adminKey');
+      const { school, adminKey } = RcAuth.getAuthSession();
 
-      let url = `./school-progress.html?school=${encodeURIComponent(school)}&key=${encodeURIComponent(key)}`;
-      if (adminKey) {
-        url += `&adminKey=${encodeURIComponent(adminKey)}`;
+      if (adminKey && school === 'Admin') {
+        window.location.href = './admin-progress.html';
+        return;
       }
 
-      window.location.href = url;
+      window.location.href = './school-progress.html';
     });
 
     // ========================================
@@ -332,9 +319,10 @@
     // ========================================
 
     document.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(window.location.search);
-      const school = params.get('school');
-      const adminKey = params.get('adminKey');
+      const auth = RcAuth.requireAuthSession();
+      if (!auth) return;
+
+      const { school, adminKey } = auth;
       const messagesSection = document.getElementById('Messages');
       const messageTitle = messagesSection.querySelector('h1');
       const messageSubtitle = messagesSection.querySelector('p');

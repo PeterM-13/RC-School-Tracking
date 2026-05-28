@@ -1,4 +1,4 @@
-1. Move school keys from URL params to browser memory.
+
 2. Re-name current DB table to 'Luton_schools'
 3. Add new DB tables called 'Edinburgh_schools' and 'Basildon_schools'
 3. Populate new tables with 3 example schools like 'Example School 1' etc.
