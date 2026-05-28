@@ -1,0 +1,83 @@
+@import url('./global.css?v=2026-02-25-1');
+
+header {
+  width: 100%;
+  min-height: 10rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-primary);
+  padding: 0 3rem;
+}
+
+header h1 {
+  color: white;
+  line-height: 4rem;
+  font-size: 3rem;
+}
+
+#logo {
+  height: 3vw;
+}
+
+main {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 3rem 2rem 4rem;
+}
+
+main h2 {
+  font-size: 2.4rem;
+  margin-bottom: 1rem;
+}
+
+.notice-card {
+  background: white;
+  border: 1px solid rgba(58, 58, 58, 0.12);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.05);
+}
+
+.notice-card p {
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+}
+
+.notice-card ul {
+  padding-left: 1.4rem;
+  margin: 1rem 0 1.25rem;
+}
+
+.notice-card li {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: var(--color-primary);
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+
+.back-link:hover {
+  color: var(--color-accent);
+}
+
+@media (max-width: 800px) {
+  header h1 {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+  }
+
+  main {
+    padding: 2rem 1rem 3rem;
+  }
+
+  main h2 {
+    font-size: 1.5rem;
+  }
+}
