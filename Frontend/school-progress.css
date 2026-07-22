@@ -90,8 +90,10 @@ p {
     background-color: var(--color--primary);
     height: 2rem;
     width: 100%;
+    --progress-percentage: 10%;
     border: 0.2rem solid var(--color-background);
     border-radius: var(--border-radius);
+    position: relative;
 }
 
 #progressBarFill {
@@ -99,12 +101,25 @@ p {
     height: 100%;
     width: 10%;
     border-radius: 2px 4px 4px 2px;
-    padding: 0 0.5rem;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
     transition: 1s;
+}
+
+#progressBarLabel {
+    position: absolute;
+    left: calc(var(--progress-percentage) + 0.5rem);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-background);
+    letter-spacing: 1px;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+#progressBarLabel.inside-fill {
+    left: auto;
+    right: calc(100% - var(--progress-percentage) + 0.5rem);
+    color: var(--color--primary);
 }
 
 #pagesContainer {

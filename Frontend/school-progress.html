@@ -23,7 +23,8 @@
         <div id="progressContainer">
             <p id="schoolName">Your Progress:</p>
             <div id="progressBar">
-                <div id="progressBarFill">10%</div>
+                <div id="progressBarFill"></div>
+                <span id="progressBarLabel">10%</span>
             </div>
         </div>
         <div id="pagesContainer">
@@ -290,17 +291,14 @@
           });
 
           const progressPercentage = Math.round((checkedCheckboxes / totalCheckboxes) * 100);
+          const progressBar = document.getElementById('progressBar');
           const progressBarFill = document.getElementById('progressBarFill');
+          const progressBarLabel = document.getElementById('progressBarLabel');
 
+          progressBar.style.setProperty('--progress-percentage', `${progressPercentage}%`);
           progressBarFill.style.width = `${progressPercentage}%`;
-          progressBarFill.textContent = `${progressPercentage}%`;
-
-          // Adjust colors based on progress
-          if (progressPercentage < 10) {
-            progressBarFill.style.color = '#E93838';
-          } else {
-            progressBarFill.style.color = '';
-          }
+          progressBarLabel.textContent = `${progressPercentage}%`;
+          progressBarLabel.classList.toggle('inside-fill', progressPercentage > 85);
 
           if (progressPercentage === 0) {
             progressBarFill.style.backgroundColor = '#3A3A3A';

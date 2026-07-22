@@ -109,6 +109,7 @@ section{
 .progress-bar {
     flex-grow: 1;
     height: 2.5rem;
+    --progress-percentage: 0%;
     background-color: var(--color-background);
     position: relative;
     min-width: 200px;
@@ -129,7 +130,20 @@ section{
 }
 
 .percentage-label {
-    padding-left: 1rem;
+    position: absolute;
+    left: calc(var(--progress-percentage) + 0.75rem);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-primary);
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.percentage-label.inside-fill {
+    left: auto;
+    right: calc(100% - var(--progress-percentage) + 0.75rem);
+    color: white;
 }
 
 #expected-progress {
@@ -315,15 +329,27 @@ section{
    RESPONSIVE DESIGN
    ======================================================================== */
 @media (max-width: 800px) {
+    header {
+        height: auto;
+        min-height: 5rem;
+        padding: 0.9rem 1rem;
+        gap: 1rem;
+    }
+
     #logo {
         display: none;
+    }
+
+    main {
+        padding: 2.5rem 0.9rem;
+        align-items: stretch;
     }
 
     #primary-buttons {
         flex-direction: column;
         align-items: stretch;
         gap: 0.8rem;
-        margin-bottom: 2rem;
+        margin-bottom: 2.4rem;
     }
 
     #primary-buttons > div {
@@ -335,6 +361,7 @@ section{
     }
 
     .primary-buttons {
+        height: 2.6rem;
         padding: 0.4rem 0.7rem;
         border-width: 3px;
     }
@@ -354,7 +381,103 @@ section{
         font-size: 1.2rem;
     }
 
+    section {
+        width: 100%;
+    }
+
+    .school-div {
+        display: grid;
+        grid-template-columns: minmax(5.8rem, 7rem) minmax(0, 1fr) 2.3rem 2.5rem;
+        gap: 0.55rem;
+        align-items: center;
+        margin-bottom: 1.8rem;
+    }
+
     .school-name {
+        width: auto;
+        margin: 0;
+        padding: 0;
+        text-align: right;
         font-size: 1.2rem;
+        line-height: 1.35;
+        letter-spacing: 1.5px;
+        overflow-wrap: anywhere;
+    }
+
+    .progress-bar {
+        min-width: 0;
+        width: 100%;
+        height: 2.1rem;
+        border-width: 3px;
+    }
+
+    .percentage-label {
+        left: calc(var(--progress-percentage) + 0.45rem);
+        font-size: 0.95rem;
+    }
+
+    .percentage-label.inside-fill {
+        right: calc(100% - var(--progress-percentage) + 0.45rem);
+    }
+
+    .message-button,
+    .edit-button {
+        width: 2.3rem;
+        height: 2.3rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .message-button {
+        grid-column: 3;
+    }
+
+    .edit-button {
+        grid-column: 4;
+    }
+
+    .message-button img,
+    .edit-button img {
+        width: 2.1rem;
+        margin: 0;
+    }
+
+    .hover-menu {
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: min(20rem, calc(100vw - 2rem));
+    }
+}
+
+@media (max-width: 420px) {
+    main {
+        padding-inline: 0.75rem;
+    }
+
+    .school-div {
+        grid-template-columns: minmax(5rem, 6.1rem) minmax(0, 1fr) 2rem 2.15rem;
+        gap: 0.45rem;
+    }
+
+    .school-name {
+        font-size: 1.05rem;
+        letter-spacing: 1.2px;
+    }
+
+    .progress-bar {
+        height: 2rem;
+    }
+
+    .message-button,
+    .edit-button {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .message-button img,
+    .edit-button img {
+        width: 1.9rem;
     }
 }

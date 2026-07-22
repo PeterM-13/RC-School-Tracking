@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="all-progress.css?v=2026-02-25-1">
+    <link rel="stylesheet" href="all-progress.css?v=2026-07-22-1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
@@ -45,6 +45,7 @@
 
           const progressBar = document.createElement('div');
           progressBar.className = 'progress-bar';
+          progressBar.style.setProperty('--progress-percentage', `${progressPercentage}%`);
 
           const progressFill = document.createElement('div');
           progressFill.className = 'progress-fill';
@@ -56,6 +57,9 @@
 
           const percentageLabel = document.createElement('span');
           percentageLabel.className = 'percentage-label';
+          if (progressPercentage > 85) {
+            percentageLabel.classList.add('inside-fill');
+          }
           percentageLabel.textContent = `${Math.round(progressPercentage)}%`;
 
           progressBar.appendChild(progressFill);

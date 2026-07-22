@@ -2,10 +2,28 @@ const RcAuth = (() => {
   const SCHOOL_KEY = 'school';
   const PASSWORD_KEY = 'key';
   const ADMIN_KEY = 'adminKey';
+  const SITE_KEY = 'site';
+  const DEFAULT_SITE = 'Luton';
+  const VALID_SITES = ['Luton', 'Edinburgh', 'Basildon'];
+
+  function normaliseSite(site) {
+    return VALID_SITES.includes(site) ? site : DEFAULT_SITE;
+  }
+
+  function setSite(site) {
+    sessionStorage.setItem(SITE_KEY, normaliseSite(site));
+  }
+
+  function getSite() {
+    const site = normaliseSite(sessionStorage.getItem(SITE_KEY));
+    sessionStorage.setItem(SITE_KEY, site);
+    return site;
+  }
 
   function setAuthSession({ school, key, adminKey = null }) {
     sessionStorage.setItem(SCHOOL_KEY, school);
     sessionStorage.setItem(PASSWORD_KEY, key);
+    getSite();
 
     if (adminKey) {
       sessionStorage.setItem(ADMIN_KEY, adminKey);
@@ -18,7 +36,8 @@ const RcAuth = (() => {
     return {
       school: sessionStorage.getItem(SCHOOL_KEY),
       key: sessionStorage.getItem(PASSWORD_KEY),
-      adminKey: sessionStorage.getItem(ADMIN_KEY)
+      adminKey: sessionStorage.getItem(ADMIN_KEY),
+      site: getSite()
     };
   }
 
@@ -42,6 +61,10 @@ const RcAuth = (() => {
   }
 
   return {
+    DEFAULT_SITE,
+    VALID_SITES,
+    setSite,
+    getSite,
     setAuthSession,
     getAuthSession,
     clearAuthSession,

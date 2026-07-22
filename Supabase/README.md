@@ -11,11 +11,13 @@ is implemented with Postgres RPC functions.
 3. Copy the Supabase project URL and anon public key.
 4. Paste them into `Frontend/js/supabase-config.js`.
 
-## Table
+## Tables
 
-### `public.school_progress`
+### `public."Luton_schools"`, `public."Edinburgh_schools"`, `public."Basildon_schools"`
 
-Stores all school login details, roadmap progress, and comments.
+Each site has its own school table for login details, roadmap progress, and
+comments. If an older `public.school_progress` table exists, `schema.sql`
+renames it to `public."Luton_schools"`.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -29,9 +31,9 @@ Stores all school login details, roadmap progress, and comments.
 
 Constraints:
 
-- `school_progress_school_unique`: one row per school name.
-- `school_progress_array`: `progress` must be a JSON array.
-- `school_progress_comments_array`: `comments` must be a JSON array.
+- `<site>_schools_school_unique`: one row per school name.
+- `<site>_schools_progress_array`: `progress` must be a JSON array.
+- `<site>_schools_comments_array`: `comments` must be a JSON array.
 
 ## Progress JSON
 
@@ -92,7 +94,7 @@ Fields:
 
 ## Access Model
 
-RLS is enabled on `school_progress`, and direct table access is revoked from
+RLS is enabled on all site tables, and direct table access is revoked from
 `anon`, `authenticated`, and `public`.
 
 The browser only receives permission to execute controlled RPC functions. Those
@@ -108,9 +110,10 @@ credential checks, progress updates, school administration, and comment updates.
 
 | Function | Purpose |
 | --- | --- |
-| `school_password_matches(p_school, p_password)` | Internal helper for school/password checks. |
-| `admin_password_matches(p_password)` | Internal helper for Admin password checks. |
-| `verify_school_password(p_name, p_password)` | Frontend login check. Returns `{ "success": true/false }`. |
+| `site_schools_table(p_site)` | Internal helper that maps `Luton`, `Edinburgh`, or `Basildon` to the matching table. Unknown sites fall back to `Luton`. |
+| `school_password_matches(p_school, p_password, p_site)` | Internal helper for school/password checks. |
+| `admin_password_matches(p_password, p_site)` | Internal helper for Admin password checks. |
+| `verify_school_password(p_name, p_password, p_site)` | Frontend login check. Returns `{ "success": true/false }`. |
 
 ### Roadmap/progress
 
@@ -118,49 +121,66 @@ credential checks, progress updates, school administration, and comment updates.
 | --- | --- |
 | `default_progress_steps()` | Returns the default 31-step roadmap JSON. |
 | `apply_progress_template(p_template, p_progress)` | Combines Admin roadmap metadata with a school row's checked values. |
-| `get_school_progress(p_name, p_password)` | Returns one school's progress after password validation. |
-| `list_school_progress(p_name, p_password, p_admin_key)` | Returns all schools' progress. Requires either a valid school password or Admin key. |
-| `update_school_progress(p_name, p_password, p_progress)` | Replaces a school's JSON progress array after password validation. |
-| `reset_all_progress(p_admin_key)` | Sets `checked` to `false` for all non-Admin school rows. |
+| `get_school_progress(p_name, p_password, p_site)` | Returns one school's progress after password validation. |
+| `list_school_progress(p_name, p_password, p_admin_key, p_site)` | Returns all schools' progress for a site. Requires either a valid school password or Admin key. |
+| `update_school_progress(p_name, p_password, p_progress, p_site)` | Replaces a school's JSON progress array after password validation. |
+| `reset_all_progress(p_admin_key, p_site)` | Sets `checked` to `false` for all non-Admin school rows in the selected site. |
 
 ### School management
 
 | Function | Purpose |
 | --- | --- |
-| `get_school_names()` | Returns school names for the login dropdown. |
-| `create_school(p_admin_key, p_name, p_password)` | Creates a new school using `default_progress_steps()`. Requires Admin key. |
-| `delete_school(p_admin_key, p_name, p_password)` | Deletes a non-Admin school. Requires Admin key and that school's password. |
+| `get_school_names(p_site)` | Returns school names for the login dropdown. |
+| `create_school(p_admin_key, p_name, p_password, p_site)` | Creates a new school using `default_progress_steps()`. Requires Admin key. |
+| `delete_school(p_admin_key, p_name, p_password, p_site)` | Deletes a non-Admin school. Requires Admin key and that school's password. |
 
 ### Comments/messages
 
 | Function | Purpose |
 | --- | --- |
-| `get_comments(p_school_name, p_school_key)` | Returns comments for a school after password validation. |
-| `add_comment(p_school_name, p_school_key, p_text, p_admin_key)` | Adds a school or Leonardo comment. `p_admin_key` makes the sender `leonardo`. |
-| `delete_comment(p_school_name, p_school_key, p_comment_index, p_admin_key)` | Deletes and re-indexes a comment. Requires Admin key. |
-| `mark_comment_viewed(p_school_name, p_school_key, p_msg_index)` | Marks one comment as viewed. |
-| `get_unviewed_comments(p_admin_key, p_sent_by)` | Returns unread comment counts by school. Requires Admin key. |
+| `get_comments(p_school_name, p_school_key, p_site)` | Returns comments for a school after password validation. |
+| `add_comment(p_school_name, p_school_key, p_text, p_admin_key, p_site)` | Adds a school or Leonardo comment. `p_admin_key` makes the sender `leonardo`. |
+| `delete_comment(p_school_name, p_school_key, p_comment_index, p_admin_key, p_site)` | Deletes and re-indexes a comment. Requires Admin key. |
+| `mark_comment_viewed(p_school_name, p_school_key, p_msg_index, p_site)` | Marks one comment as viewed. |
+| `get_unviewed_comments(p_admin_key, p_sent_by, p_site)` | Returns unread comment counts by school. Requires Admin key. |
 
 ## Seed Data
 
-`schema.sql` seeds:
+`schema.sql` seeds these rows:
 
-- `Admin`
-- `Cottesloe`
-- `Queensbury`
-- `Aylesbury High`
-- `Parmiters`
-- `Stopsley`
-- `Silverstone UTC`
-- `Roundwood`
-- `Watford Boys`
-- `Watford Girls`
-- `Chalk Hills`
-- `St Clement Danes`
-- `Lealands`
-- `Chiltern Academy`
-- `Shenley Brook End`
+### Luton
+
+| School | Password |
+| --- | --- |
+| `Admin` | `lu13pg` |
+| `Cottesloe` | `cottesloe37355` |
+| `Queensbury` | `queensbury67890` |
+| `Parmiters` | `parmiters98765` |
+| `Silverstone UTC` | `silverstoneutc44556` |
+| `Roundwood` | `roundwood77889` |
+| `Watford Boys` | `watfordboys99001` |
+| `Watford Girls` | `watfordgirls22334` |
+| `Chalk Hills` | `chalkhills55667` |
+| `St Clement Danes` | `stclementdanes88990` |
+| `Shenley Brook End` | `shenleybrookend91402` |
+
+### Edinburgh
+
+| School | Password |
+| --- | --- |
+| `Admin` | `eh52xs` |
+| `Example School 1` | `exampleschool1` |
+| `Example School 2` | `exampleschool2` |
+| `Example School 3` | `exampleschool3` |
+
+### Basildon
+
+| School | Password |
+| --- | --- |
+| `Admin` | `ss143el` |
+| `Example School 1` | `exampleschool1` |
+| `Example School 2` | `exampleschool2` |
+| `Example School 3` | `exampleschool3` |
 
 Rows are inserted with `on conflict (school) do nothing`, so rerunning the schema
 does not overwrite existing school rows.
-

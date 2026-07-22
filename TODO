@@ -1,7 +1,5 @@
-
-2. Re-name current DB table to 'Luton_schools'
-3. Add new DB tables called 'Edinburgh_schools' and 'Basildon_schools'
-3. Populate new tables with 3 example schools like 'Example School 1' etc.
-4. Update api routes to fetch from correct table based on new 'site' URL param.
-5. Add home page to base url with links to each site (Luton, Edinburgh, Basildon) that set the 'site' URL param and redirect to progress page.
-6. Add ability for admins to modify images used on roadmap, with supabase image bucket.
+[x] Re-name current DB table to 'Luton_schools'
+[x] Add new DB tables called 'Edinburgh_schools' and 'Basildon_schools'
+[x] Populate new tables with 3 example schools like 'Example School 1' etc.
+[x] Add a horizontal picker to the login page (Luton, Edinburgh, Basildon) that sets a 'site' browser session key (default to Luton).
+[x] Update api routes to fetch from correct table based on new 'site' browser session key. Do for both supabase code and client side code.

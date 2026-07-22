@@ -61,6 +61,31 @@ h2 {
   background-size: 1.5rem;
 }
 
+.site-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.site-option {
+  height: 3rem;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  background: var(--color-secondary);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.site-option.active {
+  background: var(--color-primary);
+  color: white;
+}
+
 #pswd {
   width: 100%;
   height: 3rem;
@@ -183,6 +208,10 @@ h2 {
 
   main {
     padding: 2rem 10%;
+  }
+
+  .site-picker {
+    grid-template-columns: 1fr;
   }
 
   .privacy-link {

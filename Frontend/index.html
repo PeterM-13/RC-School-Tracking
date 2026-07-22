@@ -21,6 +21,13 @@
     </header>
 
     <main>
+        <h2>Select your site</h2>
+        <div class="site-picker" role="group" aria-label="Select site">
+            <button type="button" class="site-option" data-site="Luton">Luton</button>
+            <button type="button" class="site-option" data-site="Edinburgh">Edinburgh</button>
+            <button type="button" class="site-option" data-site="Basildon">Basildon</button>
+        </div>
+
         <h2>Select your school</h2>
         <select id="school-dropdown">
             <option value="" disabled selected>Select a school</option>
@@ -88,6 +95,32 @@
           messageElement.style.display = 'none';
         }
 
+        function initialiseSitePicker() {
+          const currentSite = RcAuth.getSite();
+
+          document.querySelectorAll('.site-option').forEach((button) => {
+            const isActive = button.dataset.site === currentSite;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+
+            button.addEventListener('click', async () => {
+              if (button.dataset.site === RcAuth.getSite()) return;
+
+              RcAuth.setSite(button.dataset.site);
+              clearLoginMessage();
+              document.getElementById('pswd').value = '';
+
+              document.querySelectorAll('.site-option').forEach((option) => {
+                const optionIsActive = option.dataset.site === RcAuth.getSite();
+                option.classList.toggle('active', optionIsActive);
+                option.setAttribute('aria-pressed', optionIsActive ? 'true' : 'false');
+              });
+
+              await populateSchoolDropdown();
+            });
+          });
+        }
+
         /*
          * Populates the school dropdown with sorted schools
          */
@@ -98,6 +131,7 @@
             loadingElement.style.display = 'block';
           }, 500);
           //loadingElement.style.display = 'block';
+          dropdown.innerHTML = '<option value="" disabled selected>Select a school</option>';
 
           try {
             const schools = await RcApi.getSchoolNames();
@@ -168,6 +202,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
           startLoadingAnimation();
+          initialiseSitePicker();
           populateSchoolDropdown();
 
           const loginButton = document.getElementById('login-button');
